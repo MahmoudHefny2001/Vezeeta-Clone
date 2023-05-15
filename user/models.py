@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from geo.models import Location
+from base.models import BaseModel
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
-        print("create_user method called")
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
@@ -19,19 +19,9 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-    ]
-
-    email = models.EmailField(unique=True)
+class CustomUser(AbstractBaseUser, PermissionsMixin, BaseModel):
     name = models.CharField(max_length=255, blank=True)
-    phone_number = models.CharField(max_length=20, blank=False, null=False, unique=True)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
-    has_medical_insurance = models.BooleanField(default=False)
-    birth_date = models.DateField(null=True, blank=True)
-
+    has_medical_insurance = models.BooleanField(default=False, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -47,3 +37,4 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, max_length=255, blank=True, null= True, on_delete=models.SET_NULL, default=None)
+    

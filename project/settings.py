@@ -30,14 +30,19 @@ INSTALLED_APPS = [
 
     "rest_framework",   #
 
+    'django_rest_passwordreset', #
 
     "user",  #
     "geo",   #
     "insurance", #
     "doctor", #
     "clinic", #
+    "hospital", #
     "appointment", #
     "review", #
+    "speciality", #
+
+    "base", ###
 ]
 
 
@@ -183,6 +188,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -216,3 +222,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://192.168.0.222:8080"
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND_ARGUMENTS = {'fail_silently': False}
+
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
+# EMAIL_USE_SSL = bool(os.environ.get('EMAIL_USE_SSL'))
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = bool(os.environ.get('EMAIL_USE_TLS'))
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
+
+
+PASSWORD_RESET_URL = 'http://127.0.0.1:8000/users/password-reset/'
