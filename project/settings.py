@@ -32,6 +32,10 @@ INSTALLED_APPS = [
 
     'django_rest_passwordreset', #
 
+    'rest_framework_simplejwt.token_blacklist',  #
+
+    "base", ###
+
     "user",  #
     "geo",   #
     "insurance", #
@@ -41,8 +45,8 @@ INSTALLED_APPS = [
     "appointment", #
     "review", #
     "speciality", #
+    "medical_insurance_firm", #
 
-    "base", ###
 ]
 
 
@@ -56,21 +60,26 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
-    'DEFAULT_PARSER_CLASSES': [
+    'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-    ],
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ),
     'DEFAULT_AUTHENTICATION_BACKENDS': [
         'user.authenticate.EmailOrPhoneNumberBackend',
+        'user.authenticate.CustomJWTAuthentication',
     ]
 }
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=45),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=450),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
-    "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
+
+    "AUTH_HEADER_TYPES": ("JWT","Bearer"),
 
     "ALGORITHM": "HS256",
     "VERIFYING_KEY": "",

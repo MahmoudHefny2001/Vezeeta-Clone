@@ -22,6 +22,9 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
+from rest_framework.response import Response
+from rest_framework import status
 
 
 User = get_user_model()
@@ -74,3 +77,5 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+

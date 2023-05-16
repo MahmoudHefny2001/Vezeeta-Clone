@@ -10,7 +10,7 @@ from rest_framework import status, generics, mixins, viewsets
 from django.conf import settings
 import jwt
 from .models import CustomUser, Profile
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 
 
 
@@ -59,14 +59,25 @@ class ProfileViewSet(viewsets.ModelViewSet):
     
 
 class Logout(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     def post(self, request):
-        # Revoke the user's tokens
-        token = request.data.get('token')
-        if token:
-            BlacklistedToken.objects.create(token=token)
-        # Perform any additional actions or return a response as needed
-        return Response({"detail": "Logout successful"})
+        try:
+            # Get the token
+            refresh_token = request.data['refresh_token']
+            token = RefreshToken(refresh_token)
+            
+            # Blacklist the token
+            outstanding_token, _ = OutstandingToken.objects.get_or_create(token=str(token))
+            BlacklistedToken.objects.create(token=outstanding_token)
 
+            # Perform any additional actions or cleanup
+            # For example, you can delete any session-related data
+
+            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"Not allowed": "Token is blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
 
 class ChangePasswordView(generics.UpdateAPIView):
         """
@@ -75,7 +86,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         serializer_class = ChangePasswordSerializer
         model = CustomUser
         permission_classes = (IsAuthenticated,)
-
+        authentication_classes = [JWTAuthentication]
         def get_object(self, queryset=None):
             obj = self.request.user
             return obj

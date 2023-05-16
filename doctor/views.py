@@ -1,30 +1,111 @@
 from django.shortcuts import render
-from .models import Doctor
-from .serializers import DoctorSerializer
+from .models import Doctor, DoctorProfile
+from .serializers import DoctorSerializer, DoctorProfileSerializer, ChangePasswordSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-from rest_framework import viewsets, generics, mixins, views
+from rest_framework import viewsets, generics, mixins, views, permissions
 from rest_framework.response import Response
 from rest_framework import status
+from .authentication import CustomUserAuthBackend
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = DoctorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
-class UserDoctorViewSet(viewsets.ModelViewSet):
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
-    permission_classes = [AllowAny, IsAuthenticatedOrReadOnly]
-    # Define the allowed methods for users
-    http_method_names = ['get', 'head', 'options']
+        return Response(serializer.data)
 
-class DoctorSelfViewSet(viewsets.ModelViewSet):
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+
+class LoginView(views.APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        email_or_phone = request.data.get('email_or_phone')
+        password = request.data.get('password')
+        doctor = CustomUserAuthBackend().authenticate(request=request, username=email_or_phone, password=password)
+        print(doctor)
+        if doctor is not None:
+            access_token = AccessToken.for_user(doctor)
+            refresh_token = RefreshToken.for_user(doctor)
+            return Response({
+                'access': str(access_token),
+
+                'refresh': str(refresh_token),
+            })
+        else:
+            return Response({
+                'error': 'Invalid credentials',
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class DoctorProfileViewSet(viewsets.ModelViewSet):
+    queryset = DoctorProfile.objects.all()
+    serializer_class = DoctorProfileSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            # Allow any user to list and retrieve doctors
+            return [permissions.AllowAny()]
+        else:
+            # Only authenticated users can perform other actions
+            return [permissions.IsAuthenticated()]
+
+
+class Logout(views.APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    # Define the allowed methods for doctors themselves
-    http_method_names = ['get', 'head', 'post', 'put', 'patch', 'delete']
+    
+    def post(self, request):
+        try:
+            # Get the token
+            refresh_token = request.data['refresh_token']
+            token = RefreshToken(refresh_token)
+
+            # Blacklist the token
+            outstanding_token, _ = OutstandingToken.objects.get_or_create(token=str(token))
+            BlacklistedToken.objects.create(token=outstanding_token)
+
+            # Perform any additional actions or cleanup
+            # For example, you can delete any session-related data
+
+            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
+        except:
+            return Response({"detail": "Token is blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(generics.UpdateAPIView):
+        """
+        An endpoint for changing password.
+        """
+        serializer_class = ChangePasswordSerializer
+        model = Doctor
+        permission_classes = (IsAuthenticated,)
+
+        def get_object(self, queryset=None):
+            obj = self.request.user
+            return obj
+
+        def update(self, request, *args, **kwargs):
+            self.object = self.get_object()
+            serializer = self.get_serializer(data=request.data)
+
+            if serializer.is_valid():
+                # Check old password
+                if not self.object.check_password(serializer.data.get("old_password")):
+                    return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+                # set_password also hashes the password that the user will get
+                self.object.set_password(serializer.data.get("new_password"))
+                self.object.save()
+                response = {
+                    'status': 'success',
+                    'code': status.HTTP_200_OK,
+                    'message': 'Password updated successfully',
+                    'data': []
+                }
+
+                return Response(response)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
