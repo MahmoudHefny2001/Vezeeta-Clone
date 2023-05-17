@@ -11,6 +11,7 @@ urlpatterns = [
     path('specialities/', include('speciality.urls')),
     path('clinics/', include('clinic.urls')),
     path('doctors/', include('doctor.urls')),
+    path('appointments/', include('appointment.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,

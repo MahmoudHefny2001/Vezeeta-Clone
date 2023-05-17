@@ -63,15 +63,15 @@ class DoctorProfile(models.Model):
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, null=True, blank=True)
 
     # Availability
-    from_day = models.CharField(max_length=10, null=True, blank=False)
-    to_day = models.CharField(max_length=10, null=True, blank=False)
-    from_hour = models.TimeField(null=True, blank=False)
-    to_hour = models.TimeField(null=True, blank=False)
+    from_day = models.CharField(max_length=10, null=False, blank=False)
+    to_day = models.CharField(max_length=10, null=False, blank=False)
+    from_hour = models.TimeField(null=False, blank=False)
+    to_hour = models.TimeField(null=False, blank=False)
 
     # Pricing
-    examination_price = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=False)
+    examination_price = models.DecimalField(max_digits=5, decimal_places=2, null=False, blank=False)
 
     # Location
-    location = models.ForeignKey(Location, on_delete=models.PROTECT, null=True, blank=False)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT, null=False, blank=False)
 
 

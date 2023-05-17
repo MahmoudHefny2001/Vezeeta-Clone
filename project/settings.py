@@ -30,6 +30,8 @@ INSTALLED_APPS = [
 
     "rest_framework",   #
 
+    "django_filters",  #
+
     'django_rest_passwordreset', #
 
     'rest_framework_simplejwt.token_blacklist',  #
@@ -68,7 +70,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_BACKENDS': [
         'user.authenticate.EmailOrPhoneNumberBackend',
         'user.authenticate.CustomJWTAuthentication',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Doctor, DoctorProfile
-from .serializers import DoctorSerializer, DoctorProfileSerializer, ChangePasswordSerializer
+from .serializers import DoctorSerializer, DoctorProfileSerializer, ChangePasswordSerializer, OuterViewDoctorSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework import viewsets, generics, mixins, views, permissions
 from rest_framework.response import Response
@@ -9,6 +9,18 @@ from .authentication import CustomUserAuthBackend
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import filters
+from .models import Doctor
+from .filters import DoctorFilter
+
+
+
+class DoctorSearchAPIView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = Doctor.objects.all()
+    serializer_class = OuterViewDoctorSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['first_name', 'specialization__speciality']
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny]

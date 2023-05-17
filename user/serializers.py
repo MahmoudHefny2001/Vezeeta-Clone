@@ -42,6 +42,12 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class OuterViewUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ('id', 'name', 'phone_number', 'email', 'has_medical_insurance')
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     location = LocationSerializer(required=False)
@@ -68,6 +74,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class OuterViewProfileSerializer(serializers.ModelSerializer):
+    user = OuterViewUserSerializer(read_only=True)
+    location = LocationSerializer(required=False)
+
+    class Meta:
+        model = Profile
+        fields = ['id', 'user', 'location']
 
 class ChangePasswordSerializer(serializers.Serializer):
     model = User

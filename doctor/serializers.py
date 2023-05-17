@@ -25,12 +25,19 @@ class DoctorSerializer(serializers.ModelSerializer):
         return doctor
 
 
+
+class OuterViewDoctorSerializer(serializers.ModelSerializer):
+    specialization = MedicalSpecialtySerializer(read_only=True)
+    class Meta:
+        model = Doctor
+        fields = ('id', 'first_name', 'last_name', 'email', 'image', 'specialization')
+
+
 class DoctorProfileSerializer(serializers.ModelSerializer):
-    doctor = DoctorSerializer()
+    doctor = DoctorSerializer(read_only=True)
     class Meta:
         model = DoctorProfile
         fields = '__all__'
-
 
     
 class ChangePasswordSerializer(serializers.Serializer):
