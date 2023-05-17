@@ -8,3 +8,4 @@ class IsAppointmentOwner(BasePermission):
 
     def has_object_permission(self, request, view, appointment_obj):
         return appointment_obj.user.id == request.user.id
+
