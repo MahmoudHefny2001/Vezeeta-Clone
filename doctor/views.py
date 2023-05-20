@@ -1,26 +1,35 @@
 from django.shortcuts import render
-from .models import Doctor, DoctorProfile
-from .serializers import DoctorSerializer, DoctorProfileSerializer, ChangePasswordSerializer, OuterViewDoctorSerializer
+from .models import (
+    Doctor, 
+    DoctorProfile, 
+    DoctorExtended,
+)
+from .serializers import (
+    DoctorSerializer, 
+    DoctorProfileSerializer, 
+    ChangePasswordSerializer, 
+    OuterViewDoctorSerializer,
+    OuterViewDoctorProfileSerializer,
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from rest_framework import viewsets, generics, mixins, views, permissions
 from rest_framework.response import Response
 from rest_framework import status
-from .authentication import CustomUserAuthBackend
+from person.authentication import CustomUserAuthBackend
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
-from .models import Doctor
 from .filters import DoctorFilter
 
 
 
 class DoctorSearchAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
-    queryset = Doctor.objects.all()
+    queryset = DoctorExtended.objects.all()
     serializer_class = OuterViewDoctorSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['first_name', 'specialization__speciality']
+    search_fields = ['first_name', 'specialization__speciality', 'qualifications']
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny]
@@ -38,7 +47,6 @@ class LoginView(views.APIView):
         email_or_phone = request.data.get('email_or_phone')
         password = request.data.get('password')
         doctor = CustomUserAuthBackend().authenticate(request=request, username=email_or_phone, password=password)
-        print(doctor)
         if doctor is not None:
             access_token = AccessToken.for_user(doctor)
             refresh_token = RefreshToken.for_user(doctor)
@@ -55,7 +63,7 @@ class LoginView(views.APIView):
 
 class DoctorProfileViewSet(viewsets.ModelViewSet):
     queryset = DoctorProfile.objects.all()
-    serializer_class = DoctorProfileSerializer
+    serializer_class = OuterViewDoctorProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):
@@ -65,6 +73,7 @@ class DoctorProfileViewSet(viewsets.ModelViewSet):
         else:
             # Only authenticated users can perform other actions
             return [permissions.IsAuthenticated()]
+
 
 
 class Logout(views.APIView):
@@ -93,7 +102,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         An endpoint for changing password.
         """
         serializer_class = ChangePasswordSerializer
-        model = Doctor
+        model = DoctorExtended
         permission_classes = (IsAuthenticated,)
 
         def get_object(self, queryset=None):

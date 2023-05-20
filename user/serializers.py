@@ -1,17 +1,9 @@
 from rest_framework import serializers
-from .models import CustomUser
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.db.models import Q
-from rest_framework import serializers
-from rest_framework_jwt.serializers import JSONWebTokenSerializer, jwt_payload_handler, jwt_encode_handler
-from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import BaseUserManager
 from django.utils.translation import gettext as _
-from .models import Profile
+from .models import Profile, CustomUserExtended
 from geo.models import Location
 from geo.serializers import LocationSerializer
 from django.contrib.sites.shortcuts import get_current_site
@@ -32,17 +24,17 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = CustomUser
-        fields = ('id', 'name', 'phone_number', 'email', 'gender', 'birth_date', 'password', 'has_medical_insurance')
+        model = CustomUserExtended
+        fields = ('id', 'name', 'phone_number', 'email', 'gender', 'birth_date', 'password', 'has_medical_insurance',)
 
     def create(self, validated_data):
-        user = CustomUser.objects.create_user(**validated_data)
+        user = CustomUserExtended.objects.create_user(**validated_data)
         return user
 
 
 class OuterViewUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUser
+        model = CustomUserExtended
         fields = ('id', 'name', 'phone_number', 'email', 'has_medical_insurance')
 
 
@@ -52,7 +44,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'location']
+        fields = ('id', 'user', 'location')
+        
 
     def create(self, validated_data):
         location_data = validated_data.pop('location')
@@ -79,7 +72,8 @@ class OuterViewProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['id', 'user', 'location']
+        fields = ('id', 'user', 'location')
+
 
 class ChangePasswordSerializer(serializers.Serializer):
     model = User

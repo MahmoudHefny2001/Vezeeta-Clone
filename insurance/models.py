@@ -1,8 +1,14 @@
 from django.db import models
 from medical_insurance_firm.models import Firm
-from user.models import CustomUser
+from user.models import CustomUser, CustomUserExtended
+
 class MedicalInsurance(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'medical_insurance'
+
+
+    user = models.ForeignKey(CustomUserExtended, on_delete=models.CASCADE)
     medical_insurance_firm = models.ForeignKey(Firm, on_delete=models.CASCADE, null=True)
 
     full_name = models.CharField(max_length=200)

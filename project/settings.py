@@ -31,12 +31,11 @@ INSTALLED_APPS = [
     "rest_framework",   #
 
     "django_filters",  #
-
-    'django_rest_passwordreset', #
+    "django_extensions", #
 
     'rest_framework_simplejwt.token_blacklist',  #
 
-    "base", ###
+    "person", ###
 
     "user",  #
     "geo",   #
@@ -48,7 +47,6 @@ INSTALLED_APPS = [
     "review", #
     "speciality", #
     "medical_insurance_firm", #
-
 ]
 
 
@@ -70,14 +68,18 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_BACKENDS': [
         'user.authenticate.EmailOrPhoneNumberBackend',
         'user.authenticate.CustomJWTAuthentication',
+        'person.backends.CustomModelBackend',
+
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 
+AUTH_USER_MODEL = 'person.Person'
+
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=450),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=45),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": False,
@@ -115,9 +117,6 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
-
-
-AUTH_USER_MODEL = 'user.CustomUser'
 
 
 MIDDLEWARE = [
@@ -185,7 +184,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.environ.get('TIME_ZONE')
 
 USE_I18N = True
 
@@ -248,4 +247,3 @@ EMAIL_USE_TLS = bool(os.environ.get('EMAIL_USE_TLS'))
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 
 
-PASSWORD_RESET_URL = 'http://127.0.0.1:8000/users/password-reset/'

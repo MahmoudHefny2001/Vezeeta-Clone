@@ -7,6 +7,7 @@ from doctor.models import DoctorProfile
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from .models import Appointment
 from django.shortcuts import get_object_or_404
+from user.models import CustomUserExtended
 
 class CreateAppointmentView(CreateAPIView):
     serializer_class = AppointmentSerializer
@@ -14,9 +15,10 @@ class CreateAppointmentView(CreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
+        custom_user = get_object_or_404(CustomUserExtended, id=user.id)
         doctor_profile_id = self.kwargs['doctor_profile_id']
         doctor_profile = get_object_or_404(DoctorProfile, id=doctor_profile_id)
-        serializer.save(user=user, doctor_profile=doctor_profile)
+        serializer.save(user=custom_user, doctor_profile=doctor_profile)
     
 
 

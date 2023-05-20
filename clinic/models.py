@@ -4,6 +4,10 @@ from geo.models import Location
 
 
 class Clinic(models.Model):
+
+    class Meta:
+        db_table = 'clinic'
+
     name = models.CharField(max_length=150, null=False, blank=True)
 
     specialties = models.ManyToManyField(MedicalSpecialty)

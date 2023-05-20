@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from .authentication import CustomUserAuthBackend
+from person.authentication import CustomUserAuthBackend
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate
@@ -9,9 +9,9 @@ from .serializers import UserSerializer, ProfileSerializer, ChangePasswordSerial
 from rest_framework import status, generics, mixins, viewsets
 from django.conf import settings
 import jwt
-from .models import CustomUser, Profile
+from .models import Profile, CustomUserExtended
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
-
+from django.shortcuts import get_object_or_404
 
 
 class SignUpView(APIView):
@@ -27,10 +27,10 @@ class SignUpView(APIView):
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        print(request.data)
         email_or_phone = request.data.get('email_or_phone')
         password = request.data.get('password')
-        user = CustomUserAuthBackend().authenticate(request=request, username=email_or_phone, password=password)
+        user = CustomUserAuthBackend()\
+            .authenticate(request=request, username=email_or_phone, password=password)
 
         if user is not None:
             access_token = AccessToken.for_user(user)
@@ -55,7 +55,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
         if user.is_staff:
             return Profile.objects.all()
         else:
-            return Profile.objects.filter(user=user)
+            custom_user = get_object_or_404(CustomUserExtended, id=user.id)
+            return Profile.objects.filter(user=custom_user)
     
 
 class Logout(APIView):
@@ -73,18 +74,27 @@ class Logout(APIView):
             BlacklistedToken.objects.create(token=outstanding_token)
 
             # Perform any additional actions or cleanup
-            # For example, you can delete any session-related data
 
-            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "detail": "Logout successful"
+                }, 
+                status=status.HTTP_200_OK
+            )
         except:
-            return Response({"Not allowed": "Token is blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "Not allowed": "Token is blacklisted"
+                }, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 class ChangePasswordView(generics.UpdateAPIView):
         """
         An endpoint for changing password.
         """
         serializer_class = ChangePasswordSerializer
-        model = CustomUser
+        model = CustomUserExtended
         permission_classes = (IsAuthenticated,)
         authentication_classes = [JWTAuthentication]
         def get_object(self, queryset=None):
@@ -98,7 +108,12 @@ class ChangePasswordView(generics.UpdateAPIView):
             if serializer.is_valid():
                 # Check old password
                 if not self.object.check_password(serializer.data.get("old_password")):
-                    return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        {
+                            "old_password": ["Wrong password."]
+                        }, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
                 # set_password also hashes the password that the user will get
                 self.object.set_password(serializer.data.get("new_password"))
                 self.object.save()
@@ -106,7 +121,6 @@ class ChangePasswordView(generics.UpdateAPIView):
                     'status': 'success',
                     'code': status.HTTP_200_OK,
                     'message': 'Password updated successfully',
-                    'data': []
                 }
 
                 return Response(response)
