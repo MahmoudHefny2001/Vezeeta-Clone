@@ -9,6 +9,7 @@ from .models import Appointment
 from django.shortcuts import get_object_or_404
 from user.models import CustomUserExtended
 
+
 class CreateAppointmentView(CreateAPIView):
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated]
@@ -16,15 +17,14 @@ class CreateAppointmentView(CreateAPIView):
     def perform_create(self, serializer):
         user = self.request.user
         custom_user = get_object_or_404(CustomUserExtended, id=user.id)
-        doctor_profile_id = self.kwargs['doctor_profile_id']
+        doctor_profile_id = self.kwargs["doctor_profile_id"]
         doctor_profile = get_object_or_404(DoctorProfile, id=doctor_profile_id)
         serializer.save(user=custom_user, doctor_profile=doctor_profile)
-    
 
 
 class RetrieveUpdateDeleteAppointmentView(RetrieveUpdateDestroyAPIView):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
-    lookup_url_kwarg = 'appointment_id'
-    lookup_field = 'id'
+    lookup_url_kwarg = "appointment_id"
+    lookup_field = "id"
     permission_classes = [IsAppointmentOwner]

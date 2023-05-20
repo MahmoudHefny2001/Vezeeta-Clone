@@ -10,12 +10,16 @@ from rest_framework import status, generics, mixins, viewsets
 from django.conf import settings
 import jwt
 from .models import Profile, CustomUserExtended
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 from django.shortcuts import get_object_or_404
 
 
 class SignUpView(APIView):
     permission_classes = []
+
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -26,24 +30,31 @@ class SignUpView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
-        email_or_phone = request.data.get('email_or_phone')
-        password = request.data.get('password')
-        user = CustomUserAuthBackend()\
-            .authenticate(request=request, username=email_or_phone, password=password)
+        email_or_phone = request.data.get("email_or_phone")
+        password = request.data.get("password")
+        user = CustomUserAuthBackend().authenticate(
+            request=request, username=email_or_phone, password=password
+        )
 
         if user is not None:
             access_token = AccessToken.for_user(user)
             refresh_token = RefreshToken.for_user(user)
-            return Response({
-                'access': str(access_token),
-
-                'refresh': str(refresh_token),
-            })
+            return Response(
+                {
+                    "access": str(access_token),
+                    "refresh": str(refresh_token),
+                }
+            )
         else:
-            return Response({
-                'error': 'Invalid credentials',
-            }, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {
+                    "error": "Invalid credentials",
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
@@ -57,73 +68,68 @@ class ProfileViewSet(viewsets.ModelViewSet):
         else:
             custom_user = get_object_or_404(CustomUserExtended, id=user.id)
             return Profile.objects.filter(user=custom_user)
-    
+
 
 class Logout(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request):
         try:
             # Get the token
-            refresh_token = request.data['refresh_token']
+            refresh_token = request.data["refresh_token"]
             token = RefreshToken(refresh_token)
-            
+
             # Blacklist the token
-            outstanding_token, _ = OutstandingToken.objects.get_or_create(token=str(token))
+            outstanding_token, _ = OutstandingToken.objects.get_or_create(
+                token=str(token)
+            )
             BlacklistedToken.objects.create(token=outstanding_token)
 
             # Perform any additional actions or cleanup
 
-            return Response(
-                {
-                    "detail": "Logout successful"
-                }, 
-                status=status.HTTP_200_OK
-            )
+            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
         except:
             return Response(
-                {
-                    "Not allowed": "Token is blacklisted"
-                }, 
-                status=status.HTTP_400_BAD_REQUEST
+                {"Not allowed": "Token is blacklisted"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 class ChangePasswordView(generics.UpdateAPIView):
-        """
-        An endpoint for changing password.
-        """
-        serializer_class = ChangePasswordSerializer
-        model = CustomUserExtended
-        permission_classes = (IsAuthenticated,)
-        authentication_classes = [JWTAuthentication]
-        def get_object(self, queryset=None):
-            obj = self.request.user
-            return obj
+    """
+    An endpoint for changing password.
+    """
 
-        def update(self, request, *args, **kwargs):
-            self.object = self.get_object()
-            serializer = self.get_serializer(data=request.data)
+    serializer_class = ChangePasswordSerializer
+    model = CustomUserExtended
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = [JWTAuthentication]
 
-            if serializer.is_valid():
-                # Check old password
-                if not self.object.check_password(serializer.data.get("old_password")):
-                    return Response(
-                        {
-                            "old_password": ["Wrong password."]
-                        }, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                # set_password also hashes the password that the user will get
-                self.object.set_password(serializer.data.get("new_password"))
-                self.object.save()
-                response = {
-                    'status': 'success',
-                    'code': status.HTTP_200_OK,
-                    'message': 'Password updated successfully',
-                }
+    def get_object(self, queryset=None):
+        obj = self.request.user
+        return obj
 
-                return Response(response)
+    def update(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        serializer = self.get_serializer(data=request.data)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        if serializer.is_valid():
+            # Check old password
+            if not self.object.check_password(serializer.data.get("old_password")):
+                return Response(
+                    {"old_password": ["Wrong password."]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # set_password also hashes the password that the user will get
+            self.object.set_password(serializer.data.get("new_password"))
+            self.object.save()
+            response = {
+                "status": "success",
+                "code": status.HTTP_200_OK,
+                "message": "Password updated successfully",
+            }
+
+            return Response(response)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

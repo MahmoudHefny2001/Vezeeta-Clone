@@ -25,7 +25,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUserExtended
-        fields = ('id', 'name', 'phone_number', 'email', 'gender', 'birth_date', 'password', 'has_medical_insurance',)
+        fields = (
+            "id",
+            "name",
+            "phone_number",
+            "email",
+            "gender",
+            "birth_date",
+            "password",
+            "has_medical_insurance",
+        )
 
     def create(self, validated_data):
         user = CustomUserExtended.objects.create_user(**validated_data)
@@ -35,7 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 class OuterViewUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUserExtended
-        fields = ('id', 'name', 'phone_number', 'email', 'has_medical_insurance')
+        fields = ("id", "name", "phone_number", "email", "has_medical_insurance")
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -44,18 +53,19 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'location')
-        
+        fields = ("id", "user", "location")
 
     def create(self, validated_data):
-        location_data = validated_data.pop('location')
+        location_data = validated_data.pop("location")
         location = Location.objects.create(**location_data)
         profile = Profile.objects.create(location=location, **validated_data)
         return profile
 
     def update(self, instance, validated_data):
-        location_data = validated_data.pop('location')
-        location_serializer = LocationSerializer(instance.location, data=location_data, partial=True)
+        location_data = validated_data.pop("location")
+        location_serializer = LocationSerializer(
+            instance.location, data=location_data, partial=True
+        )
         if location_serializer.is_valid():
             location = location_serializer.save()
         else:
@@ -72,7 +82,7 @@ class OuterViewProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('id', 'user', 'location')
+        fields = ("id", "user", "location")
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -83,5 +93,3 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
-
-

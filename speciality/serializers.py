@@ -5,4 +5,4 @@ from .models import MedicalSpecialty
 class MedicalSpecialtySerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalSpecialty
-        fields = '__all__'
+        fields = "__all__"

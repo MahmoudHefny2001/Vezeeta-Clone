@@ -9,4 +9,3 @@ class MedicalSpecialtyView(generics.ListAPIView, generics.RetrieveAPIView):
     queryset = MedicalSpecialty.objects.all()
     serializer_class = MedicalSpecialtySerializer
     permission_classes = [AllowAny]
-    

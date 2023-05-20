@@ -4,9 +4,8 @@ from geo.models import Location
 
 
 class Clinic(models.Model):
-
     class Meta:
-        db_table = 'clinic'
+        db_table = "clinic"
 
     name = models.CharField(max_length=150, null=False, blank=True)
 
@@ -16,5 +15,6 @@ class Clinic(models.Model):
 
     description = models.TextField()
 
-    clinic_phone = models.CharField(max_length=20, null=False, blank=False, unique=True, db_index=True)
-    
+    clinic_phone = models.CharField(
+        max_length=20, null=False, blank=False, unique=True, db_index=True
+    )

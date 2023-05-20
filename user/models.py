@@ -6,7 +6,6 @@ from .managers import UserManager
 
 
 class CustomUser(Person):
-
     base_role = Person.Role.USER
 
     class Meta:
@@ -18,21 +17,24 @@ class CustomUser(Person):
 class CustomUserExtended(CustomUser):
     name = models.CharField(max_length=255, blank=True)
     has_medical_insurance = models.BooleanField(default=False, null=True, blank=True)
-    
+
     def __str__(self):
         return self.name
 
     class Meta:
-        db_table = 'account'
+        db_table = "account"
 
 
 class Profile(models.Model):
-
     class Meta:
-        db_table = 'user_profile'
+        db_table = "user_profile"
 
     user = models.OneToOneField(CustomUserExtended, on_delete=models.CASCADE)
-    location = models.ForeignKey(Location, max_length=255, blank=True, null=True, on_delete=models.SET_NULL, default=None)
-    
-
-    
+    location = models.ForeignKey(
+        Location,
+        max_length=255,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        default=None,
+    )
