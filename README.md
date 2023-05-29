@@ -14,7 +14,7 @@ This is a Vezeeta clone, a web application built with Django, that allows users 
 
 1. Clone the repository:
 
-    git clone https://github.com/your-username/vezeeta-clone.git
+    git clone https://github.com/MahmoudHefny2001/vezeeta-clone.git
 
 ## Navigate to the project directory:
     cd vezeeta-clone
