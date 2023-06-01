@@ -59,7 +59,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ("id", "user", "location", "points", "medical_insurance")
+        fields = ("id", "user", "location", "points")
         read_only_fields = ("points",)
 
     def create(self, validated_data):

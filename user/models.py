@@ -39,6 +39,4 @@ class Profile(models.Model):
         default=None,
     )
     points = models.PositiveIntegerField(default=0, null=True, blank=True)
-    medical_insurance = models.FileField(
-        null=True, blank=True, upload_to="users/insurances"
-    )
+    
