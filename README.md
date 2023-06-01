@@ -27,7 +27,7 @@ This is a Vezeeta clone, a web application built with Django, that allows users 
     pip3 install -r requirements.txt
 
 ## Set up the database:
-    python manage.py migrate
+    python3 manage.py migrate
 
 ## Run the development server:
     python3 manage.py runserver

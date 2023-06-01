@@ -8,6 +8,8 @@ from clinic.models import Clinic
 from user.serializers import ChangePasswordSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
 from geo.models import Location
+from review.serializers import ReviewSerializer
+from review.models import Review
 
 
 class DoctorSerializer(serializers.ModelSerializer):
@@ -53,19 +55,46 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
         fields = ("id", "first_name", "last_name", "image", "specialization")
 
 
-class DoctorProfileSerializer(serializers.ModelSerializer):
+class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
+    doctor = DoctorSerializer(read_only=True)
+
     class Meta:
         model = DoctorProfile
         fields = "__all__"
-
-    doctor = DoctorSerializer(read_only=True)
 
     def create(self, validated_data):
         doctor_profile = DoctorProfile.objects.create(**validated_data)
         return doctor_profile
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
+
+
+class DoctorProfileSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(read_only=True, many=True)
+    doctor = DoctorSerializer(read_only=True)
+
+    class Meta:
+        model = DoctorProfile
+        fields = "__all__"
+
+    def create(self, validated_data):
+        doctor_profile = DoctorProfile.objects.create(**validated_data)
+        return doctor_profile
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        reviews = Review.objects.filter(doctor=instance)
+        review_serializer = ReviewSerializer(reviews, many=True)
+        representation["reviews"] = review_serializer.data
+        return representation
+
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
+    doctor = OuterViewDoctorSerializer(read_only=True)
+    reviews = ReviewSerializer(read_only=True, many=True)
+
     class Meta:
         model = DoctorProfile
         fields = [
@@ -77,9 +106,31 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
             "from_hour",
             "to_hour",
             "examination_price",
+            "reviews",
         ]
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        reviews = Review.objects.filter(doctor=instance)
+        review_serializer = ReviewSerializer(reviews, many=True)
+        representation["reviews"] = review_serializer.data
+        return representation
+
+
+class AppointmentOuterViewDoctorProfileSerializer(serializers.ModelSerializer):
     doctor = OuterViewDoctorSerializer(read_only=True)
+
+    class Meta:
+        model = DoctorProfile
+        fields = "__all__"
+
+    def create(self, validated_data):
+        doctor_profile = DoctorProfile.objects.create(**validated_data)
+        return doctor_profile
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
 
 
 class ChangePasswordSerializer(serializers.Serializer):

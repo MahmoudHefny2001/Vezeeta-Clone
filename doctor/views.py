@@ -10,6 +10,7 @@ from .serializers import (
     ChangePasswordSerializer,
     OuterViewDoctorSerializer,
     OuterViewDoctorProfileSerializer,
+    DoctorProfileSerializerForDoctors,
 )
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
@@ -21,10 +22,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from person.authentication import CustomUserAuthBackend
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken
+from rest_framework_simplejwt.token_blacklist.models import (
+    BlacklistedToken,
+    OutstandingToken,
+)
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
 from .filters import DoctorFilter
+from review.models import Review
+from review.serializers import ReviewSerializer
 
 
 class DoctorSearchAPIView(generics.ListAPIView):
@@ -75,7 +81,23 @@ class LoginView(views.APIView):
 
 class DoctorProfileViewSet(viewsets.ModelViewSet):
     queryset = DoctorProfile.objects.all()
+    # queryset = DoctorProfile.objects.prefetch_related("reviews").all()
     serializer_class = OuterViewDoctorProfileSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            # Allow any user to list and retrieve doctors
+            return [permissions.AllowAny()]
+        else:
+            # Only authenticated users can perform other actions
+            return [permissions.IsAdminUser()]
+
+
+class DoctorProfileViewSet_Doctors(viewsets.ModelViewSet):
+    queryset = DoctorProfile.objects.all()
+    serializer_class = DoctorProfileSerializerForDoctors
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_permissions(self):

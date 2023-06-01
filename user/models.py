@@ -38,3 +38,7 @@ class Profile(models.Model):
         on_delete=models.SET_NULL,
         default=None,
     )
+    points = models.PositiveIntegerField(default=0, null=True, blank=True)
+    medical_insurance = models.FileField(
+        null=True, blank=True, upload_to="users/insurances"
+    )

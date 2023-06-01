@@ -47,13 +47,20 @@ class OuterViewUserSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "phone_number", "email", "has_medical_insurance")
 
 
+class UserReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUserExtended
+        fields = ("id", "name")
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     location = LocationSerializer(required=False)
 
     class Meta:
         model = Profile
-        fields = ("id", "user", "location")
+        fields = ("id", "user", "location", "points", "medical_insurance")
+        read_only_fields = ("points",)
 
     def create(self, validated_data):
         location_data = validated_data.pop("location")
