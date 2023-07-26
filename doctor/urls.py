@@ -3,7 +3,7 @@ from . import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r"^profiles", views.DoctorProfileViewSet)
+router.register(r"", views.DoctorProfileViewSet)
 router.register(r"^profiles-for-doctors", views.DoctorProfileViewSet_Doctors)
 
 

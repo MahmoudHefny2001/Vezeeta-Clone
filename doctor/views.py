@@ -85,7 +85,7 @@ class DoctorProfileViewSet(viewsets.ModelViewSet):
     # serializer_class = OuterViewDoctorProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
-
+    
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             # Allow any user to list and retrieve doctors

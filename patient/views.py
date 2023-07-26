@@ -15,6 +15,9 @@ from rest_framework_simplejwt.token_blacklist.models import (
     OutstandingToken,
 )
 from django.shortcuts import get_object_or_404
+from person.models import Person
+from .permissions import IsProfileOwner
+
 
 
 class SignUpView(APIView):
@@ -38,6 +41,12 @@ class LoginView(APIView):
             request=request, username=email_or_phone, password=password
         )
 
+        person = Person.objects.get(email=user.email)
+        
+        patient = PatientExtended.objects.get(id=person.id)
+
+        profile = PatientProfile.objects.get(patient=patient)
+
         if user is not None:
             access_token = AccessToken.for_user(user)
             refresh_token = RefreshToken.for_user(user)
@@ -45,6 +54,9 @@ class LoginView(APIView):
                 {
                     "access": str(access_token),
                     "refresh": str(refresh_token),
+                    
+                    "username": patient.name,
+                    "profile_id": profile.id,
                 }
             )
         else:
@@ -59,15 +71,10 @@ class LoginView(APIView):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = PatientProfile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:
-            return PatientProfile.objects.all()
-        else:
-            custom_user = get_object_or_404(PatientExtended, id=user.id)
-            return PatientProfile.objects.filter(user=custom_user)
+    permission_classes = [IsAuthenticated, IsProfileOwner]
+    authentication_classes = [JWTAuthentication]
+    
+    
 
 
 class Logout(APIView):

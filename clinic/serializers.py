@@ -13,3 +13,11 @@ class ClinicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clinic
         fields = "__all__"
+
+
+
+class OuterViewClinicSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
+    class Meta:
+        model = Clinic
+        fields = ("id", "location")

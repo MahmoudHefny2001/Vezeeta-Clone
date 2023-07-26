@@ -41,6 +41,12 @@ class PatientSerializer(serializers.ModelSerializer):
         return patient
 
 
+    def update(self, instance, validated_data):
+        # Allow partial updates
+        instance.name = validated_data.get("name", instance.name)
+        instance.has_medical_insurance = validated_data.get("has_medical_insurance", instance.has_medical_insurance)
+        instance.save()
+        return instance
 
 class OuterViewPatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -56,7 +62,7 @@ class PatientReviewSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer(read_only=True)
+    patient = PatientSerializer()
     location = LocationSerializer(required=False)
 
     class Meta:
@@ -66,8 +72,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         location_data = validated_data.pop("location")
-        location = Location.objects.create(**location_data)
-        profile = PatientProfile.objects.create(location=location, **validated_data)
+        location = Location.objects.create(**location_data)        
+        profile = PatientProfile.objects.create(location=location, **validated_data)  
         return profile
 
     def update(self, instance, validated_data):
@@ -80,6 +86,14 @@ class ProfileSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError(location_serializer.errors)
         instance.location = location
+
+        patient_data = validated_data.pop("patient")
+        patient_serializer = PatientSerializer(instance=instance.patient, data=patient_data, partial=True)
+        if patient_serializer.is_valid():
+            patient = patient_serializer.save()
+        else:
+            raise serializers.ValidationError(patient_serializer.errors)
+        instance.patient = patient
 
         instance.save()
         return instance
