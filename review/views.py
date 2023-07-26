@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status, serializers
 from django.shortcuts import get_object_or_404
-from user.models import CustomUserExtended
+from patient.models import PatientExtended
 from doctor.models import DoctorProfile
 
 

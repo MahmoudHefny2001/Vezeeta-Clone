@@ -3,5 +3,7 @@
         "editor.defaultFormatter": "ms-python.python"
     },
     "python.formatting.provider": "none",
-    "editor.links": true
+    "editor.links": true,
+    "python.analysis.typeCheckingMode": "off",
+    "editor.multiCursorModifier": "alt",
 }

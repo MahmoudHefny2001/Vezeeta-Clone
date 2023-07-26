@@ -82,7 +82,7 @@ class LoginView(views.APIView):
 class DoctorProfileViewSet(viewsets.ModelViewSet):
     queryset = DoctorProfile.objects.all()
     # queryset = DoctorProfile.objects.prefetch_related("reviews").all()
-    serializer_class = OuterViewDoctorProfileSerializer
+    # serializer_class = OuterViewDoctorProfileSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter]
 
@@ -94,6 +94,11 @@ class DoctorProfileViewSet(viewsets.ModelViewSet):
             # Only authenticated users can perform other actions
             return [permissions.IsAdminUser()]
 
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OuterViewDoctorProfileSerializer
+        return DoctorProfileSerializer
 
 class DoctorProfileViewSet_Doctors(viewsets.ModelViewSet):
     queryset = DoctorProfile.objects.all()

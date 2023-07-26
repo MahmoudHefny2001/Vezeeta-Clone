@@ -2,19 +2,19 @@ from django.db import models
 from geo.models import Location
 from person.models import Person
 from django.utils.translation import gettext_lazy as _
-from .managers import UserManager
+from .managers import PatientManager
 
 
-class CustomUser(Person):
-    base_role = Person.Role.USER
+class Patient(Person):
+    base_role = Person.Role.PATIENT
 
     class Meta:
         proxy = True
 
-    objects = UserManager()
+    objects = PatientManager()
 
 
-class CustomUserExtended(CustomUser):
+class PatientExtended(Patient):
     name = models.CharField(max_length=255, blank=True)
     has_medical_insurance = models.BooleanField(default=False, null=True, blank=True)
 
@@ -22,14 +22,14 @@ class CustomUserExtended(CustomUser):
         return self.name
 
     class Meta:
-        db_table = "account"
+        db_table = "patient"
 
 
-class Profile(models.Model):
+class PatientProfile(models.Model):
     class Meta:
-        db_table = "user_profile"
+        db_table = "patient_profile"
 
-    user = models.OneToOneField(CustomUserExtended, on_delete=models.CASCADE)
+    patient = models.OneToOneField(PatientExtended, on_delete=models.CASCADE)
     location = models.ForeignKey(
         Location,
         max_length=255,

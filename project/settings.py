@@ -15,6 +15,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 DEBUG = bool(os.environ.get("DEBUG", None))
 
+DEBUG = True
+
 ALLOWED_HOSTS = ["*"]
 
 
@@ -31,7 +33,7 @@ INSTALLED_APPS = [
     "django_extensions",  #
     "rest_framework_simplejwt.token_blacklist",  #
     "person",  ###
-    "user",  #
+    "patient",  #
     "geo",  #
     "insurance",  #
     "doctor",  #
@@ -175,11 +177,35 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_URL = "static/"
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
-MEDIA_URL = "/media/"
 
+# Local static files
+# STATIC_URL = "static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_FILES_DIRS = [BASE_DIR / "static",]
+
+
+# PRODUCTION STATIC FILES
+S3_STATIC_DIR = "static"
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{S3_STATIC_DIR}/static/"
+STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_FILES_DIRS = [BASE_DIR / "static",]
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+# Loacl media files
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
+
+# PRODUCTION MEDIA FILES
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

@@ -1,13 +1,13 @@
 from django.db import models
 from medical_insurance_firm.models import Firm
-from user.models import CustomUser, CustomUserExtended
+from patient.models import Patient, PatientExtended
 
 
 class MedicalInsurance(models.Model):
     class Meta:
         db_table = "medical_insurance"
 
-    user = models.ForeignKey(CustomUserExtended, on_delete=models.CASCADE)
+    user = models.ForeignKey(PatientExtended, on_delete=models.CASCADE)
     medical_insurance_firm = models.ForeignKey(
         Firm, on_delete=models.CASCADE, null=True
     )
@@ -20,5 +20,5 @@ class MedicalInsurance(models.Model):
         max_length=100, unique=True, db_index=True
     )
     medical_insurance_image = models.FileField(
-        upload_to="users/medical-inusrance", null=True, blank=True
+        upload_to="patients/medical-inusrance/", null=True, blank=True
     )

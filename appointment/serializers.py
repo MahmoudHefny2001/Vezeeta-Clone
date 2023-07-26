@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user.serializers import UserSerializer, OuterViewUserSerializer
+from patient.serializers import PatientSerializer, OuterViewPatientSerializer
 from doctor.serializers import (
     DoctorProfileSerializer,
     OuterViewDoctorProfileSerializer,
@@ -9,22 +9,21 @@ from doctor.models import DoctorProfile
 from geo.serializers import LocationSerializer
 from .models import Appointment
 from django.shortcuts import get_object_or_404
-from user.models import CustomUserExtended
+from patient.models import PatientExtended
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
     # doctor_profile = DoctorProfileSerializer(read_only=True)
     doctor_profile = AppointmentOuterViewDoctorProfileSerializer(read_only=True)
 
-    user = OuterViewUserSerializer(read_only=True)
+    user = OuterViewPatientSerializer(read_only=True)
     # location = LocationSerializer(read_only=True)
 
     class Meta:
         model = Appointment
-        fields = ("doctor_profile", "user", "examination_price", "time")
+        fields = ("doctor_profile", "user", "examination_price", "time", "created", "updated")
         read_only_fields = (
             "examination_price",
-            "time",
         )  # Exclude fields from write operations
 
     def create(self, validated_data):
@@ -33,7 +32,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
 
         # Retrieve the CustomUserExtended instance based on the user object
-        custom_user = get_object_or_404(CustomUserExtended, id=user.id)
+        custom_user = get_object_or_404(PatientExtended, id=user.id)
 
         appointment = Appointment.objects.create(
             doctor_profile=doctor_profile,

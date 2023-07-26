@@ -12,7 +12,7 @@ from .managers import PersonManager
 class Person(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
         ADMIN = "ADMIN", "Admin"
-        USER = "USER", "User"
+        PATIENT = "PATIENT", "Patient"
         DOCTOR = "DOCTOR", "Doctor"
 
     base_role = Role.ADMIN
@@ -45,3 +45,5 @@ class Person(AbstractBaseUser, PermissionsMixin):
         if not self.pk:
             self.role = self.base_role
             return super().save(*args, **kwargs)
+        super(Person, self).save(*args, **kwargs)
+    

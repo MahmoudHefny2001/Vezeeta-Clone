@@ -1,10 +1,10 @@
 from django.apps import AppConfig
 
 
-class UserConfig(AppConfig):
+class PatientConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "user"
-    verbose_name = "User"
+    name = "patient"
+    verbose_name = "patient"
 
     def ready(self):
-        import user.signals
+        import patient.signals

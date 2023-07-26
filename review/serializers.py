@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from .models import Review
 from doctor.models import DoctorProfile
-from user.models import CustomUserExtended
-from user.serializers import UserReviewSerializer
+from patient.models import PatientExtended
+from patient.serializers import PatientReviewSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework.validators import UniqueTogetherValidator
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserReviewSerializer(read_only=True)
+    user = PatientReviewSerializer(read_only=True)
 
     class Meta:
         model = Review

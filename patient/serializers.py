@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils.translation import gettext as _
-from .models import Profile, CustomUserExtended
+from .models import Patient, PatientExtended, PatientProfile
 from geo.models import Location
 from geo.serializers import LocationSerializer
 from django.contrib.sites.shortcuts import get_current_site
@@ -20,11 +20,11 @@ from rest_framework import status
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PatientSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
-        model = CustomUserExtended
+        model = PatientExtended
         fields = (
             "id",
             "name",
@@ -37,35 +37,37 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        user = CustomUserExtended.objects.create_user(**validated_data)
-        return user
+        patient = PatientExtended.objects.create_user(**validated_data)
+        return patient
 
 
-class OuterViewUserSerializer(serializers.ModelSerializer):
+
+class OuterViewPatientSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUserExtended
+        model = PatientExtended
         fields = ("id", "name", "phone_number", "email", "has_medical_insurance")
 
 
-class UserReviewSerializer(serializers.ModelSerializer):
+
+class PatientReviewSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CustomUserExtended
+        model = PatientExtended
         fields = ("id", "name")
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    patient = PatientSerializer(read_only=True)
     location = LocationSerializer(required=False)
 
     class Meta:
-        model = Profile
-        fields = ("id", "user", "location", "points")
+        model = PatientProfile
+        fields = ("id", "patient", "location", "points")
         read_only_fields = ("points",)
 
     def create(self, validated_data):
         location_data = validated_data.pop("location")
         location = Location.objects.create(**location_data)
-        profile = Profile.objects.create(location=location, **validated_data)
+        profile = PatientProfile.objects.create(location=location, **validated_data)
         return profile
 
     def update(self, instance, validated_data):
@@ -83,13 +85,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+
 class OuterViewProfileSerializer(serializers.ModelSerializer):
-    user = OuterViewUserSerializer(read_only=True)
+    patient = OuterViewPatientSerializer(read_only=True)
     location = LocationSerializer(required=False)
 
     class Meta:
-        model = Profile
-        fields = ("id", "user", "location")
+        model = PatientProfile
+        fields = ("id", "patient", "location")
+
 
 
 class ChangePasswordSerializer(serializers.Serializer):

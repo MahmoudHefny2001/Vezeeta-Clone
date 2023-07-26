@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .models import Doctor, DoctorProfile, DoctorExtended
-from speciality.serializers import MedicalSpecialtySerializer
+from speciality.serializers import MedicalSpecialtySerializer, OuterViewMedicalSpecialtySerializer
 from clinic.serializers import ClinicSerializer
 from geo.serializers import LocationSerializer
 from speciality.models import MedicalSpecialty
 from clinic.models import Clinic
-from user.serializers import ChangePasswordSerializer
+from patient.serializers import ChangePasswordSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
 from geo.models import Location
 from review.serializers import ReviewSerializer
@@ -48,7 +48,8 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
 class OuterViewDoctorSerializer(serializers.ModelSerializer):
-    specialization = MedicalSpecialtySerializer(read_only=True)
+    # specialization = MedicalSpecialtySerializer(read_only=True)
+    specialization = OuterViewMedicalSpecialtySerializer(read_only=True)
 
     class Meta:
         model = DoctorExtended
@@ -93,7 +94,7 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
     doctor = OuterViewDoctorSerializer(read_only=True)
-    reviews = ReviewSerializer(read_only=True, many=True)
+    # reviews = ReviewSerializer(read_only=True, many=True)
 
     class Meta:
         model = DoctorProfile
@@ -106,15 +107,15 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
             "from_hour",
             "to_hour",
             "examination_price",
-            "reviews",
+            # "reviews",
         ]
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        reviews = Review.objects.filter(doctor=instance)
-        review_serializer = ReviewSerializer(reviews, many=True)
-        representation["reviews"] = review_serializer.data
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     reviews = Review.objects.filter(doctor=instance)
+    #     review_serializer = ReviewSerializer(reviews, many=True)
+    #     representation["reviews"] = review_serializer.data
+    #     return representation
 
 
 class AppointmentOuterViewDoctorProfileSerializer(serializers.ModelSerializer):

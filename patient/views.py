@@ -5,11 +5,11 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, ProfileSerializer, ChangePasswordSerializer
+from .serializers import PatientSerializer, ProfileSerializer, ChangePasswordSerializer
 from rest_framework import status, generics, mixins, viewsets
 from django.conf import settings
 import jwt
-from .models import Profile, CustomUserExtended
+from .models import PatientProfile, PatientExtended
 from rest_framework_simplejwt.token_blacklist.models import (
     BlacklistedToken,
     OutstandingToken,
@@ -57,17 +57,17 @@ class LoginView(APIView):
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = PatientProfile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:
-            return Profile.objects.all()
+            return PatientProfile.objects.all()
         else:
-            custom_user = get_object_or_404(CustomUserExtended, id=user.id)
-            return Profile.objects.filter(user=custom_user)
+            custom_user = get_object_or_404(PatientExtended, id=user.id)
+            return PatientProfile.objects.filter(user=custom_user)
 
 
 class Logout(APIView):
@@ -85,7 +85,7 @@ class Logout(APIView):
                 token=str(token)
             )
             BlacklistedToken.objects.create(token=outstanding_token)
-
+            RefreshToken.for_user(request.user)
             # Perform any additional actions or cleanup
 
             return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
@@ -102,7 +102,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     """
 
     serializer_class = ChangePasswordSerializer
-    model = CustomUserExtended
+    model = PatientExtended
     permission_classes = (IsAuthenticated,)
     authentication_classes = [JWTAuthentication]
 
