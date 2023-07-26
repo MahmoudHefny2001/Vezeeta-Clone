@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 DEBUG = bool(os.environ.get("DEBUG", None))
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -137,6 +137,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "project.wsgi.application"
+
+CSRF_TRUSTED_ORIGINS = [
+    # 'http://127.0.0.1:8000/',
+    "https://vezeeta-clone-production.up.railway.app",
+]
 
 DATABASES = {
     "default": {
