@@ -29,11 +29,9 @@ class DoctorExtended(Doctor):
 
     # Specialization
     specialization = models.ForeignKey(MedicalSpecialty, on_delete=models.PROTECT)
-    qualifications = models.TextField(null=False, blank=False)
 
-    location = models.ForeignKey(
-        Location, on_delete=models.PROTECT, null=False, blank=False
-    )
+    qualifications = models.TextField(null=False, blank=False)
+    
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -48,16 +46,7 @@ class DoctorProfile(models.Model):
 
     doctor = models.OneToOneField(DoctorExtended, on_delete=models.CASCADE)
 
+
     # Clinic Information
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, null=True, blank=True)
-
-    # Availability
-    from_day = models.CharField(max_length=10, null=True, blank=True)
-    to_day = models.CharField(max_length=10, null=True, blank=True)
-    from_hour = models.TimeField(null=True, blank=True)
-    to_hour = models.TimeField(null=True, blank=True)
-
-    # Pricing
-    examination_price = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True
-    )
+   

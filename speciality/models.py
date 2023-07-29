@@ -11,6 +11,6 @@ class MedicalSpecialty(models.Model):
     proof_file = models.FileField(
         upload_to="doctors/certificates/", null=False, blank=False
     )
-
+    
     class Meta:
         db_table = "medical_specialty"

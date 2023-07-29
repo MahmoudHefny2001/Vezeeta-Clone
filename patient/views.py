@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from person.authentication import CustomUserAuthBackend
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
@@ -17,11 +17,13 @@ from rest_framework_simplejwt.token_blacklist.models import (
 from django.shortcuts import get_object_or_404
 from person.models import Person
 from .permissions import IsProfileOwner
-
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 
 
 class SignUpView(APIView):
     permission_classes = []
+
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def post(self, request):
         serializer = PatientSerializer(data=request.data)
@@ -33,6 +35,8 @@ class SignUpView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
 
     def post(self, request):
         email_or_phone = request.data.get("email_or_phone")
@@ -71,11 +75,26 @@ class LoginView(APIView):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = PatientProfile.objects.all()
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated, IsProfileOwner]
+    permission_classes = [IsProfileOwner]
     authentication_classes = [JWTAuthentication]
-    
-    
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
+
+    def get_permissions(self):
+        if self.action == "retrieve" or self.action == "update" or self.action == "partial_update" or self.action == "destroy":
+            self.permission_classes = [IsProfileOwner, ]
+         
+        elif self.action == 'list':
+            self.permission_classes = [IsAdminUser, ]
+        
+        return super(ProfileViewSet, self).get_permissions()
+
+
+    def get_queryset(self):
+        return PatientProfile.objects.filter(patient=self.request.user)
+        
+    
+    
 
 class Logout(APIView):
     authentication_classes = [JWTAuthentication]

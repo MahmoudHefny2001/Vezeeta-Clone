@@ -9,6 +9,10 @@ To-Do.txt
 # C extensions
 *.so
 
+.media/
+media/
+static/
+
 # Distribution / packaging
 .Python
 build/

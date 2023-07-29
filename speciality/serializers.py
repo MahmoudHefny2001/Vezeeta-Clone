@@ -11,4 +11,4 @@ class MedicalSpecialtySerializer(serializers.ModelSerializer):
 class OuterViewMedicalSpecialtySerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalSpecialty
-        fields = ("speciality",)
+        fields = ("speciality", )

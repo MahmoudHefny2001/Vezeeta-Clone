@@ -2,8 +2,8 @@ from rest_framework import serializers
 from patient.serializers import PatientSerializer, OuterViewPatientSerializer
 from doctor.serializers import (
     DoctorProfileSerializer,
-    OuterViewDoctorProfileSerializer,
-    AppointmentOuterViewDoctorProfileSerializer,
+    # OuterViewDoctorProfileSerializer,
+    # AppointmentOuterViewDoctorProfileSerializer,
 )
 from doctor.models import DoctorProfile
 from geo.serializers import LocationSerializer
@@ -14,7 +14,7 @@ from patient.models import PatientExtended
 
 class AppointmentSerializer(serializers.ModelSerializer):
     # doctor_profile = DoctorProfileSerializer(read_only=True)
-    doctor_profile = AppointmentOuterViewDoctorProfileSerializer(read_only=True)
+    # doctor_profile = AppointmentOuterViewDoctorProfileSerializer(read_only=True)
 
     user = OuterViewPatientSerializer(read_only=True)
     # location = LocationSerializer(read_only=True)

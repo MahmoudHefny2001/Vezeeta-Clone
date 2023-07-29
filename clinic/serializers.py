@@ -5,19 +5,14 @@ from geo.serializers import LocationSerializer
 
 
 class ClinicSerializer(serializers.ModelSerializer):
-    specialties = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=MedicalSpecialty.objects.all()
-    )
     location = LocationSerializer()
-
     class Meta:
         model = Clinic
-        fields = "__all__"
-
+        fields = '__all__'
 
 
 class OuterViewClinicSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     class Meta:
         model = Clinic
-        fields = ("id", "location")
+        fields = ('name', 'location', 'clinic_phone', 'examination_price',)

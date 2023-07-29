@@ -1,7 +1,7 @@
 from django.db import models
 from patient.models import Patient, PatientExtended
 from django_extensions.db.models import TimeStampedModel
-from doctor.models import DoctorProfile
+from doctor.models import DoctorProfile, DoctorExtended
 from django.db.models import UniqueConstraint
 
 
@@ -10,7 +10,7 @@ class Review(TimeStampedModel):
     rate = models.PositiveSmallIntegerField(null=True, blank=True)
     user = models.ForeignKey(PatientExtended, on_delete=models.CASCADE)
     doctor = models.ForeignKey(
-        DoctorProfile, on_delete=models.CASCADE, related_name="reviews"
+        DoctorExtended, on_delete=models.CASCADE, related_name="reviews"
     )
 
     class Meta:

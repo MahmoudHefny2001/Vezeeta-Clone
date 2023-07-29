@@ -7,10 +7,11 @@ from .models import (
 from .serializers import (
     DoctorSerializer,
     DoctorProfileSerializer,
-    ChangePasswordSerializer,
     OuterViewDoctorSerializer,
     OuterViewDoctorProfileSerializer,
-    DoctorProfileSerializerForDoctors,
+    # OuterViewDoctorProfileSerializer,
+    #ChangePasswordSerializer,
+    #DoctorProfileSerializerForDoctors,
 )
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
@@ -31,29 +32,45 @@ from rest_framework import filters
 from .filters import DoctorFilter
 from review.models import Review
 from review.serializers import ReviewSerializer
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
+from rest_framework.pagination import PageNumberPagination
+from .permissions import IsProfileOwner
+
+class DoctorListPagination(PageNumberPagination):
+    page_size = 10  # Number of results per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 
 class DoctorSearchAPIView(generics.ListAPIView):
+    pagination_class = DoctorListPagination
     permission_classes = [AllowAny]
-    queryset = DoctorExtended.objects.all()
-    serializer_class = OuterViewDoctorSerializer
+    queryset = DoctorProfile.objects.all()
+    # serializer_class = OuterViewDoctorSerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ["first_name", "specialization__speciality", "qualifications"]
+    # search_fields = ["first_name", "specialization__speciality", "qualifications"]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
 
 class DoctorRegistrationView(views.APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny,]
+    pagination_class = DoctorListPagination
+    
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def post(self, request):
-        serializer = DoctorSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data)
-
+        try:
+            serializer = DoctorSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        except Exception as e:
+            raise "Invalid data"
 
 class LoginView(views.APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
 
     def post(self, request):
         email_or_phone = request.data.get("email_or_phone")
@@ -61,6 +78,10 @@ class LoginView(views.APIView):
         doctor = CustomUserAuthBackend().authenticate(
             request=request, username=email_or_phone, password=password
         )
+
+        doctor_prfile_id = DoctorProfile.objects.filter(doctor=doctor).first().id
+        doctor_name = DoctorProfile.objects.filter(doctor=doctor).first().doctor.first_name + " " + DoctorProfile.objects.filter(doctor=doctor).first().doctor.last_name
+
         if doctor is not None:
             access_token = AccessToken.for_user(doctor)
             refresh_token = RefreshToken.for_user(doctor)
@@ -68,6 +89,9 @@ class LoginView(views.APIView):
                 {
                     "access": str(access_token),
                     "refresh": str(refresh_token),
+
+                    "doctor_profile_id": doctor_prfile_id,
+                    "doctor_name": doctor_name,
                 }
             )
         else:
@@ -79,31 +103,49 @@ class LoginView(views.APIView):
             )
 
 
-class DoctorProfileViewSet(viewsets.ModelViewSet):
+class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    pagination_class = DoctorListPagination
+
     queryset = DoctorProfile.objects.all()
-    # queryset = DoctorProfile.objects.prefetch_related("reviews").all()
-    # serializer_class = OuterViewDoctorProfileSerializer
+    
     permission_classes = [IsAuthenticatedOrReadOnly]
+    
     filter_backends = [filters.SearchFilter]
     
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    
+    
+
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             # Allow any user to list and retrieve doctors
             return [permissions.AllowAny()]
         else:
             # Only authenticated users can perform other actions
-            return [permissions.IsAdminUser()]
+            return [permissions.IsAdminUser(), IsProfileOwner()]
 
 
     def get_serializer_class(self):
         if self.action == "list":
             return OuterViewDoctorProfileSerializer
         return DoctorProfileSerializer
+    
+
+    def get_object(self):
+        print(self.queryset.values())
+        return super().get_object()
+
+    def get_queryset(self):
+        return self.queryset.order_by("id")
+
 
 class DoctorProfileViewSet_Doctors(viewsets.ModelViewSet):
     queryset = DoctorProfile.objects.all()
-    serializer_class = DoctorProfileSerializerForDoctors
+    # serializer_class = DoctorProfileSerializerForDoctors
     permission_classes = [IsAuthenticatedOrReadOnly]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    pagination_class = DoctorListPagination
+
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -145,7 +187,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     An endpoint for changing password.
     """
 
-    serializer_class = ChangePasswordSerializer
+    # serializer_class = ChangePasswordSerializer
     model = DoctorExtended
     permission_classes = (IsAuthenticated,)
 
