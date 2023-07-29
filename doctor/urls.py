@@ -14,7 +14,5 @@ urlpatterns = [
     path("logout/", views.Logout.as_view(), name="doctor-logout"),
     path("change-password/", views.ChangePasswordView.as_view()),
     
-    path("search/", views.DoctorSearchAPIView.as_view(), name="doctor_search"),
-
     path("", include(router.urls)),
 ]

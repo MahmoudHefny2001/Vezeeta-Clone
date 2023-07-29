@@ -90,14 +90,6 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     reviews = Review.objects.filter(doctor=instance)
-    #     review_serializer = ReviewSerializer(reviews, many=True)
-    #     representation["reviews"] = review_serializer.data
-    #     return representation
-
-
 
 
 

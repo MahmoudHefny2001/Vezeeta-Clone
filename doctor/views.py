@@ -42,15 +42,6 @@ class DoctorListPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class DoctorSearchAPIView(generics.ListAPIView):
-    pagination_class = DoctorListPagination
-    permission_classes = [AllowAny]
-    queryset = DoctorProfile.objects.all()
-    # serializer_class = OuterViewDoctorSerializer
-    filter_backends = [filters.SearchFilter]
-    # search_fields = ["first_name", "specialization__speciality", "qualifications"]
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
-
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny,]
@@ -110,11 +101,19 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     
     permission_classes = [IsAuthenticatedOrReadOnly]
     
-    filter_backends = [filters.SearchFilter]
-    
+    search_fields = [
+        'doctor__first_name',
+        'doctor__last_name',
+        'doctor__specialization__speciality',
+        'doctor__qualifications',
+        'clinic__name',  # Accessing 'name' field on the related Clinic model
+        'clinic__location__name',  # Accessing 'location' field on the related Clinic model
+    ]
+
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
     
-    
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+        
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -134,6 +133,7 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     def get_object(self):
         print(self.queryset.values())
         return super().get_object()
+
 
     def get_queryset(self):
         return self.queryset.order_by("id")

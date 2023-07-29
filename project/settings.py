@@ -15,7 +15,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 DEBUG = bool(os.environ.get("DEBUG", None))
 
-DEBUG = False
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
