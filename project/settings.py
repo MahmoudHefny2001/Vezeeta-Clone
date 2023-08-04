@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "review",  #
     "speciality",  #
     "medical_insurance_firm",  #
+
+    "django.contrib.postgres", # for postgres search
 ]
 
 

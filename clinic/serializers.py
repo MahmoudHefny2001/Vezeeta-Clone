@@ -15,4 +15,4 @@ class OuterViewClinicSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
     class Meta:
         model = Clinic
-        fields = ('name', 'location', 'clinic_phone', 'examination_price',)
+        fields = ('location', 'clinic_phone', 'examination_price',)

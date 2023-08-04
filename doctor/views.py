@@ -29,12 +29,14 @@ from rest_framework_simplejwt.token_blacklist.models import (
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
-from .filters import DoctorFilter
+from .filters import PartialSearchFilter, DoctorFilter
 from review.models import Review
 from review.serializers import ReviewSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.pagination import PageNumberPagination
 from .permissions import IsProfileOwner
+from django_filters.rest_framework import DjangoFilterBackend 
+
 
 class DoctorListPagination(PageNumberPagination):
     page_size = 10  # Number of results per page
@@ -100,20 +102,36 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DoctorProfile.objects.all()
     
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
     
-    search_fields = [
+    filter_backends = [
+        DjangoFilterBackend, 
+        filters.SearchFilter, 
+        filters.OrderingFilter, 
+        PartialSearchFilter,
+    ]
+    
+    filter_class = DoctorFilter
+
+    filterset_fields = [
         'doctor__first_name',
         'doctor__last_name',
         'doctor__specialization__speciality',
         'doctor__qualifications',
-        'clinic__name',  # Accessing 'name' field on the related Clinic model
         'clinic__location__name',  # Accessing 'location' field on the related Clinic model
-    ]
+        'clinic__name',  # Accessing 'name' field on the related Clinic model
+    ] 
 
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
-    
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-        
+    search_fields = [  
+        # Search fields for the search filter
+        '@doctor__first_name',
+        '@doctor__last_name',
+        '@doctor__specialization__speciality',
+        '@doctor__qualifications',
+        '@clinic__location__name',
+        '@clinic__name', 
+    ]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -130,13 +148,21 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         return DoctorProfileSerializer
     
 
-    def get_object(self):
-        print(self.queryset.values())
+    def get_object(self):    
         return super().get_object()
 
 
     def get_queryset(self):
         return self.queryset.order_by("id")
+
+
+    def get_filter_backends(self):
+        filter_backends = super().get_filter_backends()
+        search_fields = self.search_fields + [f"^{field}" for field in self.search_fields]
+
+        return filter_backends + [PartialSearchFilter(search_fields=search_fields)]
+
+
 
 
 class DoctorProfileViewSet_Doctors(viewsets.ModelViewSet):
