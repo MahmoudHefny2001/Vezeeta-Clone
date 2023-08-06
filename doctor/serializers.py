@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Doctor, DoctorProfile, DoctorExtended
 from speciality.serializers import MedicalSpecialtySerializer, OuterViewMedicalSpecialtySerializer
-from clinic.serializers import ClinicSerializer, OuterViewClinicSerializer
+from clinic.serializers import ClinicSerializer
 from geo.serializers import LocationSerializer
 from speciality.models import MedicalSpecialty
 from clinic.models import Clinic
@@ -67,7 +67,7 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
     doctor = OuterViewDoctorSerializer(read_only=True)
-    clinic = OuterViewClinicSerializer(read_only=True)
+    clinic = ClinicSerializer(read_only=True)
 
 
     class Meta:
@@ -84,7 +84,7 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
     doctor = OuterViewDoctorSerializer(read_only=True)
     clinic = ClinicSerializer(read_only=True)
-    
+
     class Meta:
         model = DoctorProfile
         fields = '__all__'
