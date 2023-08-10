@@ -41,9 +41,12 @@ class Person(AbstractBaseUser, PermissionsMixin):
         abstract = False
         db_table = "person"
 
-    def save(self, *args, **kwargs):
+    def save(self, force_update=True, commit=True, *args, **kwargs):
         if not self.pk:
             self.role = self.base_role
             return super().save(*args, **kwargs)
         super(Person, self).save(*args, **kwargs)
     
+
+    def __str__(self) -> str:
+        return self.email
