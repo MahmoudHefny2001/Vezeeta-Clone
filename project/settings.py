@@ -15,6 +15,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 DEBUG = bool(os.environ.get("DEBUG", None))
 
+if DEBUG:
+    DEBUG = False
 
 # For production
 
