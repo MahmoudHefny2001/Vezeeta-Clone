@@ -19,7 +19,12 @@ class PersonManager(BaseUserManager):
         user.save()
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, phone_number=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+
+
+        if not phone_number:
+            self.phone_number = None
+            
         return self.create_user(email, password, **extra_fields)
