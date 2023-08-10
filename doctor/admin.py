@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import DoctorExtended, DoctorProfile
 
-admin.site.register(DoctorExtended)
 admin.site.register(DoctorProfile)
 
 
@@ -11,3 +10,7 @@ class DoctorModelAdmin(admin.ModelAdmin):
         # Hash the password before saving the object
         obj.set_password(form.cleaned_data['password'])
         super().save_model(request, obj, form, change)
+
+
+
+admin.site.register(DoctorExtended, DoctorModelAdmin)
