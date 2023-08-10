@@ -12,4 +12,4 @@ class PersonModelAdmin(admin.ModelAdmin):
         obj.set_password(form.cleaned_data['password']) 
         super().save_model(request, obj, form, change)
 
-admin.site.register(Person)
+admin.site.register(Person, PersonModelAdmin)
