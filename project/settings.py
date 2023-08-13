@@ -20,8 +20,8 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-
 # DEBUG = True
+
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
@@ -166,16 +166,17 @@ CSRF_TRUSTED_ORIGINS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("DATABASE_USER"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
-        "HOST": os.environ.get("DATABASE_HOST"),
-        "PORT": os.environ.get("DATABASE_PORT"),
+        "NAME": str(os.environ.get("DATABASE_NAME")),
+        "USER": str(os.environ.get("DATABASE_USER")),
+        "PASSWORD": str(os.environ.get("DATABASE_PASSWORD")),
+        "HOST": str(os.environ.get("DATABASE_HOST")),
+        "PORT": int(os.environ.get("DATABASE_PORT")),
         # 'TEST': {
         #     'NAME': '',
         # },
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

@@ -119,38 +119,20 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = DoctorFilter
 
     filterset_fields = [
-        # 'doctor__first_name',
-        # 'doctor__last_name',
-
         'doctor__full_name',
-
-        'doctor__location',
-
-
-        # 'doctor__specialization__speciality',
-
+        'doctor__area_or_center',
         'doctor__specialization',
-        
-
+        'doctor__location',
         'doctor__qualifications',
-        # 'clinic__location__name',  # Accessing 'location' field on the related Clinic model
-        # 'clinic__name',  # Accessing 'name' field on the related Clinic model
     ] 
 
     search_fields = [  
         # Search fields for the search filter
-        # '@doctor__first_name',
-        # '@doctor__last_name',
-
-        '@doctor__full_name',
-
-        # '@doctor__specialization__speciality',
-
         '@doctor__specialization',
-        
+        '@doctor__area_or_center'
+        '@doctor__full_name',
+        '@doctor__specialization',
         '@doctor__qualifications',
-        # '@clinic__location__name',
-        # '@clinic__name', 
     ]
 
     def get_permissions(self):

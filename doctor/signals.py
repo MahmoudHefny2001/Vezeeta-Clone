@@ -7,7 +7,7 @@ from .models import Doctor, DoctorProfile, DoctorExtended
 def create_doctor_profile(sender, instance, created, **kwargs):
     try:
         if created and instance.role == "DOCTOR":
-            doctorprofile = doctorprofile.objects.create(doctor=instance)
+            doctorprofile = DoctorProfile.objects.create(doctor=instance)
             doctorprofile.save()
     except Exception as e:
         print(e)

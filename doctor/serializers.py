@@ -21,35 +21,24 @@ class DoctorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
 
-            # "first_name",
-            # "last_name",
             
-
             "full_name",
 
             "image",
             "phone_number",
             "email",
-            "specialization",
             "qualifications",
             "password",
             "gender",
             "birth_date",
             
             "appointment_price" ,
+            "location",
+            "medical_speciality_description",
+            "area_or_center",
+            "location_details",
+            "specialization",
         )
-
-    # def create(self, validated_data):
-    #     try:
-    #         specialization_data = validated_data.pop("specialization")
-    #         # Create the nested specialization object
-    #         specialization = MedicalSpecialty.objects.create(**specialization_data)        
-    #         # Create the Doctor instance
-    #         doctor = DoctorExtended.objects.create_user(
-    #             specialization=specialization, **validated_data)
-    #         return doctor
-    #     except Exception as e:
-    #         raise e
 
 
 
@@ -63,9 +52,7 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             
-            # "first_name",
-            # "last_name",
-            
+
             "full_name",
 
             "image",
@@ -73,6 +60,12 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "qualifications",
 
             "appointment_price" ,
+
+            "location",
+            "medical_speciality_description",
+            "area_or_center",
+            "location_details",
+            "specialization",
 
         )
 
@@ -96,7 +89,6 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
 class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
     doctor = OuterViewDoctorSerializer(read_only=True)
-    # clinic = ClinicSerializer(read_only=True)
     
     class Meta:
         model = DoctorProfile

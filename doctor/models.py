@@ -23,22 +23,6 @@ class Doctor(Person):
 
 
 class DoctorExtended(Doctor):
-    image = models.ImageField(upload_to="doctors/images", null=True, blank=True)
-    
-    # first_name = models.CharField(max_length=150, null=False, blank=False)
-    # last_name = models.CharField(max_length=150, null=False, blank=False)
-
-    full_name = models.CharField(max_length=200, null=False, blank=False)
-
-    appointment_price = models.PositiveIntegerField(null=False, blank=False)
-
-    medical_speciality_description = models.TextField(_("description"), null=True, blank=True)
-
-    # Specialization
-    # specialization = models.ForeignKey(MedicalSpecialty, on_delete=models.PROTECT)
-
-    qualifications = models.TextField(null=False, blank=False)
-
 
     LOCATION_CHOICES = [
         ("قنا", "قنا"),
@@ -112,10 +96,30 @@ class DoctorExtended(Doctor):
 
     ]
 
-    location = models.CharField(choices=LOCATION_CHOICES, null=False, blank=False)
 
-    location_details = models.TextField()
-    
+    AREA_OR_CENTER_CHOICES = [
+        # egyptian centers only 
+        ("نجع حمادي", "نجع حمادي"),
+        ("دشنا", "دشنا"),
+        ("فرشوط", "فرشوط"),
+        ("قنا", "قنا"),
+        ("قفط", "قفط"),
+        ("قوص", "قوص"),
+        ("نقادة", "نقادة"),
+
+        # Add assiut centers
+        ("أبنوب", "أبنوب"),
+        ("أسيوط", "أسيوط"),
+        ("أسيوط الجديدة", "أسيوط الجديدة"),
+        ("أطفيح", "أطفيح"),
+        ("البدرشين", "البدرشين"),
+        ("البداري", "البداري"),
+        ("البياضية", "البياضية"),
+        ("الحوامدية", "الحوامدية"),      
+        ("الساحل", "الساحل"),
+
+    ] 
+            
 
     SPECIAIALIZATION_CHOICES = [
         ("جلدية", "جلدية"),
@@ -182,17 +186,6 @@ class DoctorExtended(Doctor):
         ("أمراض سمعية", "أمراض سمعية"),
         ("أمراض صدرية", "أمراض صدرية"),
         
-        # List all the next
-        # "روماتيزم" 
-        # "سمعيات" 
-        # "صدر وجهاز تنفسي"
-        # "طب الاسرة"
-        # "طب تقويمي" 
-        # "علاج الآلام" 
-        # "علاج طبيعي واصابات ملاعب"
-        # "عيون" 
-        # "كبد" 
-        # "كلي" 
 
         ("أمراض قلب", "أمراض قلب"),
         ("أمراض معدية", "أمراض معدية"),
@@ -208,7 +201,24 @@ class DoctorExtended(Doctor):
         ("نطق وتخاطب", "نطق وتخاطب"),
     ]
 
+    image = models.ImageField(upload_to="doctors/images", null=True, blank=True)
+    
+
+    full_name = models.CharField(max_length=200, null=False, blank=False)
+
+    appointment_price = models.PositiveIntegerField(null=False, blank=False)
+
+    medical_speciality_description = models.TextField(_("description"), null=True, blank=True)
+
+
+    qualifications = models.TextField(null=False, blank=False)
+    location = models.CharField(choices=LOCATION_CHOICES, null=False, blank=False)
+
     specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, blank=True)    
+
+    area_or_center = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False)
+
+    location_details = models.TextField()
 
     def __str__(self):
         return f"{self.full_name}"
