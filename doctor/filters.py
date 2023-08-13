@@ -14,13 +14,20 @@ class DoctorFilter(django_filters.FilterSet):
         
         model = DoctorProfile
         fields = {
-            "doctor__first_name": ["contains", "startswith", "exact", "icontains",],
-            "doctor__last_name": ["contains", "startswith", "exact", "icontains"],
-            "doctor__specialization__speciality": ["startswith", "exact", "icontains", "contains"],
+            # "doctor__first_name": ["contains", "startswith", "exact", "icontains",],
+            # "doctor__last_name": ["contains", "startswith", "exact", "icontains"],
+            
+            "doctor__full_name": ["contains", "startswith", "exact", "icontains"],
+            
+
+            # "doctor__specialization__speciality": ["startswith", "exact", "icontains", "contains"],
+            
+            "doctor__specialization": ["startswith", "exact", "icontains", "contains"],
+            
             "doctor__qualifications": ["startswith", "exact", "icontains", "contains"],
-            "clinic__location__name": ["startswith", "exact", "icontains", "contains"],
+            # "clinic__location__name": ["startswith", "exact", "icontains", "contains"],
         }
-        together = ['doctor__first_name', 'doctor__last_name']
+        
 
 
     def __init__(self, *args, **kwargs):

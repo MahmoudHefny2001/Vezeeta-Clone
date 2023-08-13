@@ -13,15 +13,20 @@ from review.models import Review
 
 
 class DoctorSerializer(serializers.ModelSerializer):
-    specialization = MedicalSpecialtySerializer()
+    
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = DoctorExtended
         fields = (
             "id",
-            "first_name",
-            "last_name",
+
+            # "first_name",
+            # "last_name",
+            
+
+            "full_name",
+
             "image",
             "phone_number",
             "email",
@@ -31,48 +36,56 @@ class DoctorSerializer(serializers.ModelSerializer):
             "gender",
             "birth_date",
             
+            "appointment_price" ,
         )
 
-    def create(self, validated_data):
-        try:
-            specialization_data = validated_data.pop("specialization")
-            # Create the nested specialization object
-            specialization = MedicalSpecialty.objects.create(**specialization_data)        
-            # Create the Doctor instance
-            doctor = DoctorExtended.objects.create_user(
-                specialization=specialization, **validated_data)
-            return doctor
-        except Exception as e:
-            raise e
+    # def create(self, validated_data):
+    #     try:
+    #         specialization_data = validated_data.pop("specialization")
+    #         # Create the nested specialization object
+    #         specialization = MedicalSpecialty.objects.create(**specialization_data)        
+    #         # Create the Doctor instance
+    #         doctor = DoctorExtended.objects.create_user(
+    #             specialization=specialization, **validated_data)
+    #         return doctor
+    #     except Exception as e:
+    #         raise e
 
 
 
 
 class OuterViewDoctorSerializer(serializers.ModelSerializer):
-    specialization = OuterViewMedicalSpecialtySerializer()
+    # specialization = OuterViewMedicalSpecialtySerializer()
     
 
     class Meta:
         model = DoctorExtended
         fields = (
             "id",
-            "first_name",
-            "last_name",
+            
+            # "first_name",
+            # "last_name",
+            
+            "full_name",
+
             "image",
             "specialization",
             "qualifications",
+
+            "appointment_price" ,
+
         )
 
 
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
     doctor = OuterViewDoctorSerializer(read_only=True)
-    clinic = OuterViewClinicSerializer(read_only=True)
+    # clinic = OuterViewClinicSerializer(read_only=True)
 
 
     class Meta:
         model = DoctorProfile
-        fields = ("id", "doctor", "clinic",)
+        fields = ("id", "doctor",)
 
 
 
@@ -83,7 +96,7 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
 class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
     doctor = OuterViewDoctorSerializer(read_only=True)
-    clinic = ClinicSerializer(read_only=True)
+    # clinic = ClinicSerializer(read_only=True)
     
     class Meta:
         model = DoctorProfile

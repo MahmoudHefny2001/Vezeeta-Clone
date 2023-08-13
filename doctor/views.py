@@ -47,9 +47,10 @@ class DoctorListPagination(PageNumberPagination):
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny,]
-    pagination_class = DoctorListPagination
     
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+    
 
     def post(self, request):
         try:
@@ -58,7 +59,9 @@ class DoctorRegistrationView(views.APIView):
             serializer.save()
             return Response(serializer.data)
         except Exception as e:
-            raise "Invalid data"
+            print(e)
+            raise e
+
 
 class LoginView(views.APIView):
     permission_classes = [AllowAny]
@@ -73,7 +76,8 @@ class LoginView(views.APIView):
         )
 
         doctor_prfile_id = DoctorProfile.objects.filter(doctor=doctor).first().id
-        doctor_name = DoctorProfile.objects.filter(doctor=doctor).first().doctor.first_name + " " + DoctorProfile.objects.filter(doctor=doctor).first().doctor.last_name
+        
+        doctor_name = DoctorProfile.objects.filter(doctor=doctor).first().doctor.full_name
 
         if doctor is not None:
             access_token = AccessToken.for_user(doctor)
@@ -115,22 +119,35 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     filter_class = DoctorFilter
 
     filterset_fields = [
-        'doctor__first_name',
-        'doctor__last_name',
-        'doctor__specialization__speciality',
+        # 'doctor__first_name',
+        # 'doctor__last_name',
+
+        'doctor__full_name',
+
+        # 'doctor__specialization__speciality',
+
+        'doctor__specialization',
+
+
         'doctor__qualifications',
-        'clinic__location__name',  # Accessing 'location' field on the related Clinic model
-        'clinic__name',  # Accessing 'name' field on the related Clinic model
+        # 'clinic__location__name',  # Accessing 'location' field on the related Clinic model
+        # 'clinic__name',  # Accessing 'name' field on the related Clinic model
     ] 
 
     search_fields = [  
         # Search fields for the search filter
-        '@doctor__first_name',
-        '@doctor__last_name',
-        '@doctor__specialization__speciality',
+        # '@doctor__first_name',
+        # '@doctor__last_name',
+
+        '@doctor__full_name',
+
+        # '@doctor__specialization__speciality',
+
+        '@doctor__specialization',
+        
         '@doctor__qualifications',
-        '@clinic__location__name',
-        '@clinic__name', 
+        # '@clinic__location__name',
+        # '@clinic__name', 
     ]
 
     def get_permissions(self):

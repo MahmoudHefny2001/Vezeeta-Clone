@@ -24,17 +24,56 @@ class Doctor(Person):
 
 class DoctorExtended(Doctor):
     image = models.ImageField(upload_to="doctors/images", null=True, blank=True)
-    first_name = models.CharField(max_length=150, null=False, blank=False)
-    last_name = models.CharField(max_length=150, null=False, blank=False)
+    
+    # first_name = models.CharField(max_length=150, null=False, blank=False)
+    # last_name = models.CharField(max_length=150, null=False, blank=False)
+
+    full_name = models.CharField(max_length=200, null=False, blank=False)
+
+    appointment_price = models.PositiveIntegerField(null=False, blank=False)
 
     # Specialization
-    specialization = models.ForeignKey(MedicalSpecialty, on_delete=models.PROTECT)
+    # specialization = models.ForeignKey(MedicalSpecialty, on_delete=models.PROTECT)
 
     qualifications = models.TextField(null=False, blank=False)
+
+
+    LOCATION_CHOICES = [
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+    ]
+
+    location = models.CharField(choices=LOCATION_CHOICES, null=False, blank=False)
+
+    location_details = models.TextField()
     
 
+    SPECIAIALIZATION_CHOICES = [
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+        ("", ""),
+
+    ]
+
+    specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, blank=True)    
+
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.full_name}"
 
     class Meta:
         db_table = "doctor"
@@ -48,5 +87,5 @@ class DoctorProfile(models.Model):
 
 
     # Clinic Information
-    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, null=True, blank=True)
+    # clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, null=True, blank=True)
    

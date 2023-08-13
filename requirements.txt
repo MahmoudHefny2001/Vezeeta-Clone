@@ -10,10 +10,12 @@ Django==4.2.1
 django-cors-headers==3.14.0
 django-extensions==3.2.1
 django-filter==23.2
+django-seed==0.3.1
 django-storages==1.13.2
 djangorestframework==3.14.0
 djangorestframework-jwt==1.11.0
 djangorestframework-simplejwt==5.2.2
+Faker==19.3.0
 gunicorn==21.2.0
 idna==3.4
 jmespath==1.0.1
@@ -35,5 +37,7 @@ requests==2.30.0
 s3transfer==0.6.1
 six==1.16.0
 sqlparse==0.4.4
+tomli==2.0.1
+toposort==1.10
 typing_extensions==4.5.0
 urllib3==1.26.16

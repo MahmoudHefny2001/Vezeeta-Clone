@@ -15,13 +15,13 @@ SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 DEBUG = bool(os.environ.get("DEBUG", None))
 
-if DEBUG:
-    DEBUG = False
 
 # For production
-
 if DEBUG:
     DEBUG = False
+
+
+# DEBUG = True
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "review",  #
     "speciality",  #
     "medical_insurance_firm",  #
+
+    'django_seed',  # for seeding the database
 
     "django.contrib.postgres", # for postgres search
 ]

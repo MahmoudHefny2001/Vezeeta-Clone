@@ -1,0 +1,11 @@
+1 - full name 
+
+2 - Clinic name
+
+3 - Clininc/Location field in doctor table 
+
+4 - Doctor Table has choicefield for specializations
+
+5 - Appointment Price on doctor table
+
+

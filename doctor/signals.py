@@ -5,5 +5,9 @@ from .models import Doctor, DoctorProfile, DoctorExtended
 
 @receiver(post_save, sender=DoctorExtended)
 def create_doctor_profile(sender, instance, created, **kwargs):
-    if created:
-        DoctorProfile.objects.create(doctor=instance)
+    try:
+        if created and instance.role == "DOCTOR":
+            doctorprofile = doctorprofile.objects.create(doctor=instance)
+            doctorprofile.save()
+    except Exception as e:
+        print(e)
