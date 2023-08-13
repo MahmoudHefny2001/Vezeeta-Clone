@@ -124,10 +124,13 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
         'doctor__full_name',
 
+        'doctor__location',
+
+
         # 'doctor__specialization__speciality',
 
         'doctor__specialization',
-
+        
 
         'doctor__qualifications',
         # 'clinic__location__name',  # Accessing 'location' field on the related Clinic model
