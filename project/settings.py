@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-DEBUG = True
+# DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -210,28 +210,28 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 
 # Local static files
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_FILES_DIRS = [BASE_DIR / "static",]
+# STATIC_URL = "static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
 # PRODUCTION STATIC FILES
-# S3_STATIC_DIR = "static"
-# STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{S3_STATIC_DIR}/static/"
-# STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
-# STATIC_FILES_DIRS = [BASE_DIR / "static",]
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+S3_STATIC_DIR = "static"
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{S3_STATIC_DIR}/static/"
+STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
+STATIC_FILES_DIRS = [BASE_DIR / "static",]
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 # Loacl media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
 # PRODUCTION MEDIA FILES
-# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
