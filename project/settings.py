@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-# DEBUG = True
+DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -84,8 +84,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day'
+        'anon': '1000/day',
+        'user': '10000/day'
     },
 }
 

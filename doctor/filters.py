@@ -9,25 +9,29 @@ import django_filters
 
 class DoctorFilter(django_filters.FilterSet):
 
+    doctor__specialization = django_filters.ChoiceFilter(choices=DoctorExtended.SPECIAIALIZATION_CHOICES)
+    doctor__location = django_filters.ChoiceFilter(choices=DoctorExtended.LOCATION_CHOICES)
+    doctor__area_or_center = django_filters.ChoiceFilter(choices=DoctorExtended.AREA_OR_CENTER_CHOICES)
+
     
     class Meta:
         
         model = DoctorProfile
-        fields = {
-            # "doctor__first_name": ["contains", "startswith", "exact", "icontains",],
-            # "doctor__last_name": ["contains", "startswith", "exact", "icontains"],
+        # fields = {
+        #     # "doctor__first_name": ["contains", "startswith", "exact", "icontains",],
+        #     # "doctor__last_name": ["contains", "startswith", "exact", "icontains"],
             
-            "doctor__full_name": ["contains", "startswith", "exact", "icontains"],
+        #     "doctor__full_name": ["contains", "startswith", "exact", "icontains"],
             
 
-            # "doctor__specialization__speciality": ["startswith", "exact", "icontains", "contains"],
+        #     # "doctor__specialization__speciality": ["startswith", "exact", "icontains", "contains"],
             
-            "doctor__specialization": ["startswith", "exact", "icontains", "contains"],
+        #     "doctor__specialization": ["startswith", "exact", "icontains", "contains"],
             
-            "doctor__qualifications": ["startswith", "exact", "icontains", "contains"],
-            # "clinic__location__name": ["startswith", "exact", "icontains", "contains"],
-        }
-        
+        #     "doctor__qualifications": ["startswith", "exact", "icontains", "contains"],
+        #     # "clinic__location__name": ["startswith", "exact", "icontains", "contains"],
+        # }
+        fields = ['doctor__specialization', 'doctor__location', 'doctor__area_or_center']    
 
 
     def __init__(self, *args, **kwargs):
@@ -71,3 +75,4 @@ class PartialSearchFilter(filters.SearchFilter):
         print("Filtered queryset:", queryset)
 
         return queryset
+    
