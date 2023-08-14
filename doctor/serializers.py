@@ -38,6 +38,7 @@ class DoctorSerializer(serializers.ModelSerializer):
             "area_or_center",
             "location_details",
             "specialization",
+            "clinic_number",
         )
 
 
@@ -66,7 +67,7 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "area_or_center",
             "location_details",
             "specialization",
-
+            "clinic_number",
         )
 
 
