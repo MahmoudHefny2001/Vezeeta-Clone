@@ -154,7 +154,7 @@ class DoctorExtended(Doctor):
     image = models.ImageField(upload_to="doctors/images", null=True, blank=True)
     
 
-    full_name = models.CharField(max_length=200, null=False, blank=False)
+    full_name = models.CharField(max_length=100, null=False, blank=False)
 
     appointment_price = models.PositiveIntegerField(null=False, blank=False)
 
@@ -166,7 +166,7 @@ class DoctorExtended(Doctor):
 
     location = models.CharField(choices=LOCATION_CHOICES, null=False, blank=False)
 
-    specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, blank=True)    
+    specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, blank=True, db_index=True)    
 
     area_or_center = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False)
 
@@ -185,7 +185,4 @@ class DoctorProfile(models.Model):
 
     doctor = models.OneToOneField(DoctorExtended, on_delete=models.CASCADE)
 
-
-    # Clinic Information
-    # clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE, null=True, blank=True)
    

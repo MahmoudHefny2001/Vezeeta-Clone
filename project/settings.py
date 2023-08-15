@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-DEBUG = True
+# DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -50,10 +50,13 @@ INSTALLED_APPS = [
     "speciality",  #
     "medical_insurance_firm",  #
 
+    'rest_framework_word_filter',
+
     'django_seed',  # for seeding the database
 
     "django.contrib.postgres", # for postgres search
 ]
+
 
 
 REST_FRAMEWORK = {

@@ -14,16 +14,16 @@ from review.models import Review
 
 class DoctorSerializer(serializers.ModelSerializer):
     
+    specialization = serializers.SerializerMethodField()
+    
+
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = DoctorExtended
         fields = (
-            "id",
-
-            
+            "id",           
             "full_name",
-
             "image",
             "phone_number",
             "email",
@@ -31,7 +31,6 @@ class DoctorSerializer(serializers.ModelSerializer):
             "password",
             "gender",
             "birth_date",
-            
             "appointment_price" ,
             "location",
             "medical_speciality_description",
@@ -42,26 +41,36 @@ class DoctorSerializer(serializers.ModelSerializer):
         )
 
 
+    def get_specialization(self, obj):
+        return dict(obj.SPECIAIALIZATION_CHOICES).get(obj.specialization, '')
+
+    def get_location(self, obj):
+        return dict(obj.LOCATION_CHOICES).get(obj.location, '')
+
+    def get_area_or_center(self, obj):
+        return dict(obj.AREA_OR_CENTER_CHOICES).get(obj.area_or_center, '')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['specialization'] = self.get_specialization(instance)
+        representation['location'] = self.get_location(instance)
+        representation['area_or_center'] = self.get_area_or_center(instance)
+        return representation
 
 
-class OuterViewDoctorSerializer(serializers.ModelSerializer):
-    # specialization = OuterViewMedicalSpecialtySerializer()
-    
+
+
+class OuterViewDoctorSerializer(serializers.ModelSerializer):    
 
     class Meta:
         model = DoctorExtended
         fields = (
             "id",
-            
-
             "full_name",
-
             "image",
             "specialization",
             "qualifications",
-
             "appointment_price" ,
-
             "location",
             "medical_speciality_description",
             "area_or_center",
@@ -70,19 +79,30 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "clinic_number",
         )
 
+    def get_specialization(self, obj):
+        return dict(obj.SPECIAIALIZATION_CHOICES).get(obj.specialization, '')
+
+    def get_location(self, obj):
+        return dict(obj.LOCATION_CHOICES).get(obj.location, '')
+
+    def get_area_or_center(self, obj):
+        return dict(obj.AREA_OR_CENTER_CHOICES).get(obj.area_or_center, '')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['specialization'] = self.get_specialization(instance)
+        representation['location'] = self.get_location(instance)
+        representation['area_or_center'] = self.get_area_or_center(instance)
+        return representation
+    
 
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
     doctor = OuterViewDoctorSerializer(read_only=True)
-    # clinic = OuterViewClinicSerializer(read_only=True)
-
 
     class Meta:
         model = DoctorProfile
         fields = ("id", "doctor",)
-
-
-
 
 
 
@@ -94,9 +114,6 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorProfile
         fields = '__all__'
-
-
-
 
 
 
@@ -114,61 +131,3 @@ class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation
-
-
-
-
-
-
-
-
-# class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
-#     doctor = OuterViewDoctorSerializer(read_only=True)
-#     # reviews = ReviewSerializer(read_only=True, many=True)
-#     clinic = ClinicSerializer(read_only=True)
-#     class Meta:
-#         model = DoctorProfile
-#         fields = [
-#             "id",
-#             "doctor",
-#             "clinic",
-#             "from_day",
-#             "to_day",
-#             "from_hour",
-#             "to_hour",
-#             "examination_price",
-#             # "reviews",
-#         ]
-
-#     # def to_representation(self, instance):
-#     #     representation = super().to_representation(instance)
-#     #     reviews = Review.objects.filter(doctor=instance)
-#     #     review_serializer = ReviewSerializer(reviews, many=True)
-#     #     representation["reviews"] = review_serializer.data
-#     #     return representation
-
-
-# class AppointmentOuterViewDoctorProfileSerializer(serializers.ModelSerializer):
-#     doctor = OuterViewDoctorSerializer(read_only=True)
-
-#     class Meta:
-#         model = DoctorProfile
-#         fields = "__all__"
-
-#     def create(self, validated_data):
-#         doctor_profile = DoctorProfile.objects.create(**validated_data)
-#         return doctor_profile
-
-#     def to_representation(self, instance):
-#         representation = super().to_representation(instance)
-#         return representation
-
-
-# class ChangePasswordSerializer(serializers.Serializer):
-#     model = DoctorExtended
-
-#     """
-#     Serializer for password change endpoint.
-#     """
-#     old_password = serializers.CharField(required=True)
-#     new_password = serializers.CharField(required=True)

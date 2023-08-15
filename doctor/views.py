@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+
 from .models import (
     Doctor,
     DoctorProfile,
@@ -9,9 +11,7 @@ from .serializers import (
     DoctorProfileSerializer,
     OuterViewDoctorSerializer,
     OuterViewDoctorProfileSerializer,
-    # OuterViewDoctorProfileSerializer,
-    #ChangePasswordSerializer,
-    #DoctorProfileSerializerForDoctors,
+
 )
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
@@ -29,7 +29,6 @@ from rest_framework_simplejwt.token_blacklist.models import (
 )
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import filters
-from .filters import PartialSearchFilter, DoctorFilter
 from review.models import Review
 from review.serializers import ReviewSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
@@ -38,6 +37,9 @@ from .permissions import IsProfileOwner
 from django_filters.rest_framework import DjangoFilterBackend 
  
 from django.db.models import Q
+
+from rest_framework_word_filter import FullWordSearchFilter
+
 
 
 
@@ -103,47 +105,6 @@ class LoginView(views.APIView):
             )
 
 
-SPECIALIZATION_CHOICES_DICT = {
-    '1': "جلدية",
-    '2': "اسنان",
-    '3': "نفسي",
-    '4': "عظام",
-    '5': "اطفال وحديثي الولادة",
-    '6': "مخ واعصاب",
-    '7': "نساءوتوليد",
-    '8': "انف واذن وحجره",
-    '9': "قلب واوعبة دموية",
-    '10': "أمراض الدم",
-    '11': "باطنة",
-    '12': "تخسيس وتغذية",
-    '13': "جراحة اطفال",
-    '14': "جراحة اورام",
-    '15': "جراحة اوعية دمويه",
-    '16': "جراحة تجميل",
-    '17': "جراحة سمنة وماظير",
-    '18': "جراحة عامة",
-    '19': "جراحة عمود فقري",
-    '20': "جراحة قلب وصدر",
-    '21': "جراحة مخ واعصاب",
-    '22': "حساسية ومناعة",
-    '23': "حقن مجهري واطفال انابيب",
-    '24': "ذكورة وعقم",
-    '25': "روماتيزم",
-    '26': "سمعيات",
-    '27': "صدر وجهاز تنفسي",
-    '28': "طب الاسرة",
-    '29': "طب تقويمي",
-    '30': "علاج الآلام",
-    '31': "علاج طبيعي واصابات ملاعب",
-    '32': "عيون",
-    '33': "كبد",
-    '34': "كلي",
-    '35': "مراكز اشعة",
-    '36': "مسالك بوليه",
-    '37': "ممارسة عامة",
-    '39': "نطق وتخاطب"
-}
-
 
 class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = DoctorListPagination
@@ -158,11 +119,17 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         DjangoFilterBackend, 
         filters.SearchFilter, 
         filters.OrderingFilter, 
-        PartialSearchFilter,
+        FullWordSearchFilter,
     ]
-    
-    filter_class = DoctorFilter
-    
+
+
+    word_fields = (
+        'doctor__full_name',
+        'doctor__specialization',
+        'doctor__qualifications',
+        'doctor__location',
+        'doctor__area_or_center',
+    )
 
     filterset_fields = [
         'doctor__full_name',
@@ -173,13 +140,17 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     ] 
 
     search_fields = [  
-        # Search fields for the search filter
-        '@doctor__specialization',
-        '@doctor__area_or_center'
-        '@doctor__full_name',
-        '@doctor__specialization',
-        '@doctor__qualifications',
-    ]
+        'doctor__specialization',
+        'doctor__area_or_center'
+        'doctor__full_name',
+        'doctor__qualifications',
+    ]   
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OuterViewDoctorProfileSerializer
+        return DoctorProfileSerializer
+
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -190,41 +161,14 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
             return [permissions.IsAdminUser(), IsProfileOwner()]
 
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return OuterViewDoctorProfileSerializer
-        return DoctorProfileSerializer
     
-    
-    def get_object(self):
-        
+
+    def get_object(self):    
         return super().get_object()
 
 
-    
     def get_queryset(self):
-        
-        queryset = DoctorProfile.objects.all()
-        
-        specialization = self.request.query_params.get('doctor__specialization')
-        if specialization is not None:
-            print(specialization)
-            # Build a query to match any of the specialization numbers
-            specialization_choice = SPECIALIZATION_CHOICES_DICT[specialization]
-            print(specialization_choice)
-
-            queryset = queryset.filter(doctor__specialization=specialization_choice)
-            print(queryset.values())
-            
-        
-        return queryset.order_by("id")
-    
-
-    def get_filter_backends(self):
-        filter_backends = super().get_filter_backends()
-        search_fields = self.search_fields + [f"^{field}" for field in self.search_fields]
-
-        return filter_backends + [PartialSearchFilter(search_fields=search_fields)]
+        return self.queryset.order_by("id")
 
 
 
