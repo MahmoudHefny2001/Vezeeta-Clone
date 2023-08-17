@@ -60,6 +60,8 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class OuterViewDoctorSerializer(serializers.ModelSerializer):    
 
+    specialization = serializers.CharField()
+
     class Meta:
         model = DoctorExtended
         fields = (
@@ -77,21 +79,21 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "clinic_number",
         )
 
-    def get_specialization(self, obj):
-        return dict(obj.SPECIAIALIZATION_CHOICES).get(obj.specialization, '')
+    # def get_specialization(self, obj):
+    #     return dict(obj.SPECIAIALIZATION_CHOICES).get(obj.specialization, '')
 
-    def get_location(self, obj):
-        return dict(obj.LOCATION_CHOICES).get(obj.location, '')
+    # def get_location(self, obj):
+    #     return dict(obj.LOCATION_CHOICES).get(obj.location, '')
 
-    def get_area_or_center(self, obj):
-        return dict(obj.AREA_OR_CENTER_CHOICES).get(obj.area_or_center, '')
+    # def get_area_or_center(self, obj):
+    #     return dict(obj.AREA_OR_CENTER_CHOICES).get(obj.area_or_center, '')
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation['specialization'] = self.get_specialization(instance)
-        representation['location'] = self.get_location(instance)
-        representation['area_or_center'] = self.get_area_or_center(instance)
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #     representation['specialization'] = self.get_specialization(instance)
+    #     representation['location'] = self.get_location(instance)
+    #     representation['area_or_center'] = self.get_area_or_center(instance)
+    #     return representation
     
 
 

@@ -23,7 +23,7 @@ class PersonManager(BaseUserManager):
                 raise ValueError("The Email field must be set")
             email = self.normalize_email(email)
             user = self.model(email=email, **extra_fields)
-            user.set_password(make_password(password))
+            user.set_password(password)
             user.save()
 
             return user
@@ -31,12 +31,16 @@ class PersonManager(BaseUserManager):
         except Exception as e:
             raise e
 
+
     def create_superuser(self, email, phone_number=None, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         
-        generator = UniqueRandomNumberGenerator()
-        phone_number = generator.generate_unique_number()  # Adjust the length as needed
         
+        
+        generator = UniqueRandomNumberGenerator()
+        phone_number = generator.generate_unique_number() # Adjust the length as needed
+        
+
         return self.create_user(email, password, phone_number=phone_number, **extra_fields)
         

@@ -72,10 +72,9 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ),
-    "DEFAULT_AUTHENTICATION_BACKENDS": [
-        "user.authenticate.EmailOrPhoneNumberBackend",
-        "user.authenticate.CustomJWTAuthentication",
-        "person.backends.CustomModelBackend",
+
+    'DEFAULT_AUTHENTICATION_BACKENDS': [
+        'django.contrib.auth.backends.ModelBackend',
     ],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 
@@ -83,14 +82,21 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
+
     'DEFAULT_THROTTLE_RATES': {
         'anon': '1000/day',
         'user': '10000/day'
     },
 }
 
-
 AUTH_USER_MODEL = "person.Person"
+
+
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "person.authentication.CustomUserAuthBackend",
+]
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=45),
@@ -129,6 +135,7 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  ##
+
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -159,7 +166,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 
 CSRF_TRUSTED_ORIGINS = [
-    # 'http://127.0.0.1:8000/',
+    'http://127.0.0.1:8000/',
     "https://vezeeta-clone-production.up.railway.app",
 ]
 

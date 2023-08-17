@@ -42,9 +42,13 @@ class Person(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
 
+    EMAIL_FIELD = 'email'
+    
+
     class Meta:
         abstract = False
         db_table = "person"
+
 
     def save(self, force_update=True, commit=True, *args, **kwargs):
         if not self.pk:

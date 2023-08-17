@@ -61,7 +61,14 @@ class DoctorRegistrationView(views.APIView):
         try:
             serializer = DoctorSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            serializer.save()
+
+            # Make sure you pass the specialization choice correctly in the data
+            specialization_choice = request.data.get("specialization")
+            if specialization_choice not in dict(DoctorExtended.SPECIAIALIZATION_CHOICES):
+                return Response({"error": "Invalid specialization choice"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.save(specialization=specialization_choice)  # Save specialization
+            
             return Response(serializer.data)
         except Exception as e:
             print(e)
@@ -109,7 +116,10 @@ class LoginView(views.APIView):
                 )
 
         except Exception as e:
-            raise e
+            return Response(
+                {"error": f" An error occurred: {str(e)} "},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = DoctorListPagination
@@ -176,23 +186,6 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset.order_by("id")
 
 
-
-
-class DoctorProfileViewSet_Doctors(viewsets.ModelViewSet):
-    queryset = DoctorProfile.objects.all()
-    # serializer_class = DoctorProfileSerializerForDoctors
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
-    pagination_class = DoctorListPagination
-
-
-    def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
-            # Allow any user to list and retrieve doctors
-            return [permissions.AllowAny()]
-        else:
-            # Only authenticated users can perform other actions
-            return [permissions.IsAuthenticated()]
 
 
 class Logout(views.APIView):
