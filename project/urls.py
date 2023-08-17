@@ -11,8 +11,7 @@ urlpatterns = [
     path("00my11-1secure0-0admin1-11url00/", admin.site.urls),
 
     path("patients/", include("patient.urls")),
-    path("specialities/", include("speciality.urls")),
-    path("clinics/", include("clinic.urls")),
+    
     path("doctors/", include("doctor.urls")),
     path("appointments/", include("appointment.urls")),
     path("reviews/", include("review.urls")),

@@ -8,4 +8,6 @@
 
 5 - Appointment Price on doctor table
 
+6 - Test new doctor / patient authentication
 
+7 - Globalization

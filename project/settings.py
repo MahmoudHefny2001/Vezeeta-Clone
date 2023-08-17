@@ -40,14 +40,11 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",  #
     "person",  ###
     "patient",  #
-    "geo",  #
     "insurance",  #
     "doctor",  #
-    "clinic",  #
-    "hospital",  #
     "appointment",  #
     "review",  #
-    "speciality",  #
+    
     "medical_insurance_firm",  #
 
     'rest_framework_word_filter',

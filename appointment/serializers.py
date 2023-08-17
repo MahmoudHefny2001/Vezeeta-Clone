@@ -6,7 +6,6 @@ from doctor.serializers import (
     # AppointmentOuterViewDoctorProfileSerializer,
 )
 from doctor.models import DoctorProfile
-from geo.serializers import LocationSerializer
 from .models import Appointment
 from django.shortcuts import get_object_or_404
 from patient.models import PatientExtended

@@ -76,35 +76,40 @@ class LoginView(views.APIView):
     def post(self, request):
         email_or_phone = request.data.get("email_or_phone")
         password = request.data.get("password")
-        doctor = CustomUserAuthBackend().authenticate(
-            request=request, username=email_or_phone, password=password
-        )
 
-        doctor_prfile_id = DoctorProfile.objects.filter(doctor=doctor).first().id
+        try:
         
-        doctor_name = DoctorProfile.objects.filter(doctor=doctor).first().doctor.full_name
-
-        if doctor is not None:
-            access_token = AccessToken.for_user(doctor)
-            refresh_token = RefreshToken.for_user(doctor)
-            return Response(
-                {
-                    "access": str(access_token),
-                    "refresh": str(refresh_token),
-
-                    "doctor_profile_id": doctor_prfile_id,
-                    "doctor_name": doctor_name,
-                }
-            )
-        else:
-            return Response(
-                {
-                    "error": "Invalid credentials",
-                },
-                status=status.HTTP_401_UNAUTHORIZED,
+            doctor = CustomUserAuthBackend().authenticate(
+                request=request, username=email_or_phone, password=password
             )
 
 
+            doctor_prfile_id = DoctorProfile.objects.filter(doctor=doctor).first().id
+        
+            doctor_name = DoctorProfile.objects.filter(doctor=doctor).first().doctor.full_name
+
+            if doctor is not None:
+                access_token = AccessToken.for_user(doctor)
+                refresh_token = RefreshToken.for_user(doctor)
+                return Response(
+                    {
+                        "access": str(access_token),
+                        "refresh": str(refresh_token),
+
+                        "doctor_profile_id": doctor_prfile_id,
+                        "doctor_name": doctor_name,
+                    }
+                )
+            else:
+                return Response(
+                    {
+                        "error": "Invalid credentials",
+                    },
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
+        except Exception as e:
+            raise e
 
 class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = DoctorListPagination

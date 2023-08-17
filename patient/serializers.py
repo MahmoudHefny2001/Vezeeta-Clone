@@ -4,8 +4,7 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils.translation import gettext as _
 from .models import Patient, PatientExtended, PatientProfile
-from geo.models import Location
-from geo.serializers import LocationSerializer
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.utils.http import urlsafe_base64_encode
@@ -63,7 +62,7 @@ class PatientReviewSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     patient = PatientSerializer()
-    location = LocationSerializer(required=False)
+    # location = LocationSerializer(required=False)
 
     class Meta:
         model = PatientProfile
@@ -72,20 +71,20 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         location_data = validated_data.pop("location")
-        location = Location.objects.create(**location_data)        
-        profile = PatientProfile.objects.create(location=location, **validated_data)  
-        return profile
+        # location = Location.objects.create(**location_data)        
+        # profile = PatientProfile.objects.create(location=location, **validated_data)  
+        # return profile
 
     def update(self, instance, validated_data):
         location_data = validated_data.pop("location")
-        location_serializer = LocationSerializer(
-            instance.location, data=location_data, partial=True
-        )
-        if location_serializer.is_valid():
-            location = location_serializer.save()
-        else:
-            raise serializers.ValidationError(location_serializer.errors)
-        instance.location = location
+        # location_serializer = LocationSerializer(
+            # instance.location, data=location_data, partial=True
+        # )
+        # if location_serializer.is_valid():
+            # location = location_serializer.save()
+        # else:
+            # raise serializers.ValidationError(location_serializer.errors)
+        # instance.location = location
 
         patient_data = validated_data.pop("patient")
         patient_serializer = PatientSerializer(instance=instance.patient, data=patient_data, partial=True)
@@ -102,7 +101,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class OuterViewProfileSerializer(serializers.ModelSerializer):
     patient = OuterViewPatientSerializer(read_only=True)
-    location = LocationSerializer(required=False)
+    # location = LocationSerializer(required=False)
 
     class Meta:
         model = PatientProfile

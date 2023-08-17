@@ -1,8 +1,5 @@
 from django.db import models
 from person.models import Person
-from speciality.models import MedicalSpecialty
-from clinic.models import Clinic
-from geo.models import Location
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -12,6 +9,7 @@ from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
 from .managers import DoctorManager
 
+from person.validators import valid_phone_number
 
 class Doctor(Person):
     base_role = Person.Role.DOCTOR
@@ -159,14 +157,14 @@ class DoctorExtended(Doctor):
     appointment_price = models.PositiveIntegerField(null=False, blank=False)
 
     medical_speciality_description = models.TextField(_("description"), null=True, blank=True)
-
-    clinic_number = models.CharField(max_length=20, null=True, blank=True)
+    
+    clinic_number = models.CharField(max_length=20, null=False, blank=False, unique=True, validators=[valid_phone_number])
 
     qualifications = models.TextField(null=False, blank=False)
 
     location = models.CharField(choices=LOCATION_CHOICES, null=False, blank=False)
 
-    specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, blank=True, db_index=True)    
+    specialization = models.CharField(choices=SPECIAIALIZATION_CHOICES, null=False, blank=False, db_index=True)    
 
     area_or_center = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False)
 

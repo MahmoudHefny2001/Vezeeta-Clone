@@ -1,5 +1,4 @@
 from django.db import models
-from geo.models import Location
 from person.models import Person
 from django.utils.translation import gettext_lazy as _
 from .managers import PatientManager
@@ -30,13 +29,13 @@ class PatientProfile(models.Model):
         db_table = "patient_profile"
 
     patient = models.OneToOneField(PatientExtended, on_delete=models.CASCADE)
-    location = models.ForeignKey(
-        Location,
-        max_length=255,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        default=None,
-    )
+    # location = models.ForeignKey(
+        # Location,
+        # max_length=255,
+        # blank=True,
+        # null=True,
+        # on_delete=models.SET_NULL,
+        # default=None,
+    # )
     points = models.PositiveIntegerField(default=0, null=True, blank=True)
     

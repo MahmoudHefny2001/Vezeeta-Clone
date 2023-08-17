@@ -1,13 +1,7 @@
 from rest_framework import serializers
 from .models import Doctor, DoctorProfile, DoctorExtended
-from speciality.serializers import MedicalSpecialtySerializer, OuterViewMedicalSpecialtySerializer
-from clinic.serializers import ClinicSerializer, OuterViewClinicSerializer
-from geo.serializers import LocationSerializer
-from speciality.models import MedicalSpecialty
-from clinic.models import Clinic
 from patient.serializers import ChangePasswordSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
-from geo.models import Location
 from review.serializers import ReviewSerializer
 from review.models import Review
 
@@ -57,6 +51,10 @@ class DoctorSerializer(serializers.ModelSerializer):
         representation['area_or_center'] = self.get_area_or_center(instance)
         return representation
 
+
+    def create(self, validated_data):
+        doctor = DoctorExtended.objects.create_user(**validated_data)
+        return doctor
 
 
 

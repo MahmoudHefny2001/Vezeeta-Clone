@@ -8,6 +8,9 @@ from django.contrib.auth.models import (
 from django.utils.translation import gettext_lazy as _
 from .managers import PersonManager
 
+from .validators import valid_phone_number
+
+
 
 class Person(AbstractBaseUser, PermissionsMixin):
     class Role(models.TextChoices):
@@ -23,11 +26,12 @@ class Person(AbstractBaseUser, PermissionsMixin):
         ("M", "Male"),
         ("F", "Female"),
     ]
-
+    
     email = models.EmailField(unique=True, db_index=True)
     phone_number = models.CharField(
         max_length=20, blank=False, 
-        null=False, unique=True, db_index=True
+        null=False, unique=True, db_index=True,
+        validators=[valid_phone_number]
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True)
     birth_date = models.DateField(null=True, blank=True)
