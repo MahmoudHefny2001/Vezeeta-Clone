@@ -7,7 +7,8 @@ from .choices import SPECIAIALIZATION_CHOICES
 class SpecializationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Specialization
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ('id',)
 
     def get_specialization(self, obj):
         return dict(SPECIAIALIZATION_CHOICES).get(obj.specialization, '')

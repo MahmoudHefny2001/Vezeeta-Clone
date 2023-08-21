@@ -11,7 +11,7 @@ from .managers import DoctorManager
 
 from person.validators import valid_phone_number
 
-from geo.models import Location
+from geo.models import Location, Address
 
 from specialization.models import Specialization
 
@@ -39,7 +39,7 @@ class DoctorExtended(Doctor):
 
     specialization = models.ForeignKey(Specialization, on_delete=models.CASCADE, null=False, blank=False)    
 
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=False, blank=False)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=False, blank=False)
 
     def __str__(self):
         return f"{self.full_name}"

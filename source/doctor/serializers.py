@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenErro
 from review.serializers import ReviewSerializer
 from review.models import Review
 
-from geo.serializers import LocationSerializer
+from geo.serializers import LocationSerializer, AddressSerializer
 from specialization.serializers import SpecializationSerializer
 
 
@@ -28,17 +28,17 @@ class DoctorSerializer(serializers.ModelSerializer):
             "appointment_price" ,
             "specialization",
             "clinic_number",
-            "location",
+            "address",
         )
 
     
     def create(self, validated_data):
         specialization = validated_data.pop("specialization")
-        location = validated_data.pop("location")
+        address = validated_data.pop("address")
 
         doctor = DoctorExtended.objects.create_user(
             specialization=specialization,
-            location=location,
+            address=address,
             **validated_data
         )
         return doctor
@@ -50,7 +50,7 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
     specialization = SpecializationSerializer()
 
     # area_or_center = AreaOrCenterSerializer()
-    location = LocationSerializer()
+    address = AddressSerializer()
 
     class Meta:
         model = DoctorExtended
@@ -60,7 +60,7 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "image",
             "qualifications",
             "appointment_price" ,
-            "location",
+            "address",
             "specialization",
             "clinic_number",
         )

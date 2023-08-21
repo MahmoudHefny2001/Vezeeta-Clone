@@ -145,30 +145,23 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         'doctor__full_name',
         'doctor__specialization__specialization',
         'doctor__qualifications',
-        'doctor__city_city',
-        'doctor__location__area_or_center',
+        'doctor__address__name',
+        'doctor__address__location__city',
     )
 
-    # filterset_fields = [
-        # 'doctor__full_name',
-        # 'doctor__location__city',
-       ## "doctor__location__area_or_center",
-        # 'doctor__specialization__specialization',
-        # 'doctor__qualifications',    
-    # ] 
+    filterset_fields = [
+        'doctor__full_name',
+        'doctor__address__name',
+        'doctor__address__location__city',
+        'doctor__specialization__specialization',
+        'doctor__qualifications',    
+    ] 
 
-    filterset_fields = {
-        'doctor__full_name': ['exact', 'icontains'],
-        'doctor__location__city': ['exact'],
-        'doctor__location__area_or_center': ['exact'],  # Modify this line
-        'doctor__specialization__specialization': ['exact'],
-        'doctor__qualifications': ['exact'],
-    }
-
+    
     search_fields = [  
         'doctor__specialization__specialization',
-        'doctor__location__city',
-        "doctor__location__area_or_center",
+        'doctor__address__name',
+        'doctor__address__location__city',
         'doctor__full_name',
         'doctor__qualifications',
     ]   
@@ -197,6 +190,15 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        city_id = self.request.query_params.get('doctor__address__name')
+        area_id = self.request.query_params.get('doctor__address__location__city')
+
+        if city_id and area_id:
+            return queryset.filter(
+                doctor__address__location_id=city_id,
+                doctor__address_id=area_id
+            )
 
         return self.queryset.order_by("id")
 

@@ -256,6 +256,7 @@ RED_SEA_AREAS = [
     ('3', "القصير"),
     ('4', "سفاجا"),
     # ... continue with more Red Sea areas
+    
 ]
 
 JANZOUR_AREAS = [
@@ -272,4 +273,32 @@ SOUTH_SINAI_AREAS = [
     ('3', "نويبع"),
     ('4', "طابا"),
     # ... continue with more South Sinai areas
+]
+
+# ALL_AREAS = (
+    # CAIRO_AREAS + ALEX_AREAS + GIZA_AREAS + LUXOR_AREAS + ASWAN_AREAS + SHARQIA_AREAS + GIZA_AREAS+ 
+    # PORTSAID_AREAS + QALYUBIA_AREAS + SOHAG_AREAS + MATRUH_AREAS + ISMAILIA_AREAS + ASYUT_AREAS + 
+    # DAMANHUR_AREAS + MINYA_AREAS + SUEZ_AREAS + DAMIETTA_AREAS + BEHEIRA_AREAS + 
+    # FAYOUM_AREAS + KAFR_EL_SHEIKH_AREAS + QENA_AREAS + RED_SEA_AREAS + 
+    # JANZOUR_AREAS + SOUTH_SINAI_AREAS 
+# )
+
+
+AREA_OR_CENTER_CHOICES = [
+    ('1', "أبنوب"),
+    ('2', "أسيوط"),
+    ('3', "أسيوط الجديدة"),
+    ('4', "أطفيح"),
+    ('5', "البدرشين"),
+    ('6', "البداري"),
+    ('7', "البياضية"),
+    ('8', "الحوامدية"),
+    ('9', "الساحل"),
+    ('10', "نجع حمادي"),
+    ('11', "فرشوط"),
+    ('12', "دشنا"),
+    ('13', "قنا"),
+    ('14', "قفط"),
+    ('15', "قوص"),
+    ('16', "نقادة")
 ]
