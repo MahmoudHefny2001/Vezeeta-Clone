@@ -11,3 +11,7 @@
 6 - Test new doctor / patient authentication
 
 7 - Globalization
+
+8 - Only areas of city itself
+
+9 - Reservation
