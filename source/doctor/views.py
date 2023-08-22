@@ -191,14 +191,15 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        city_id = self.request.query_params.get('doctor__address__name')
-        area_id = self.request.query_params.get('doctor__address__location__city')
-
-        if city_id and area_id:
-            return queryset.filter(
-                doctor__address__location_id=city_id,
-                doctor__address_id=area_id
-            )
+        specialization = self.request.query_params.get('specialization', None)
+        city = self.request.query_params.get('city', None)
+        area = self.request.query_params.get('area', None)
+        if specialization is not None:
+            queryset = queryset.filter(doctor__specialization__specialization=specialization)
+        if city is not None:
+            queryset = queryset.filter(doctor__address__location__city=city)
+        if area is not None:
+            queryset = queryset.filter(doctor__address__name=area)
 
         return self.queryset.order_by("id")
 

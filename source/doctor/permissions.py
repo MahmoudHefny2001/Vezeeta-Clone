@@ -4,5 +4,4 @@ from person.models import Person
 
 class IsProfileOwner(BasePermission):  
     pass
-    # def has_object_permission(self, request, view, obj):
-        # return obj.doctor.email == request.user.email or obj.doctor.phone_number == request.user.phone_number
+    

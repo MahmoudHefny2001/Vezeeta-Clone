@@ -39,7 +39,7 @@ class DoctorExtended(Doctor):
 
     specialization = models.ForeignKey(Specialization, on_delete=models.CASCADE, null=False, blank=False)    
 
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=False, blank=False)
+    address = models.ForeignKey(Address, on_delete=models.SET_DEFAULT, null=False, blank=False, default=1)
 
     def __str__(self):
         return f"{self.full_name}"
