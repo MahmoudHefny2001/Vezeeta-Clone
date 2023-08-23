@@ -13,9 +13,13 @@ class Location(models.Model):
 
     city = models.CharField(choices=CITY_CHOICES, null=False, blank=False, db_index=True)
     
-
-    def __str__(self) -> str:
-        return self.city
+    
+    def __str__(self):
+        # Loop through the CITY_CHOICES to find the corresponding string value
+        for value, display_text in CITY_CHOICES:
+            if value == self.city:
+                return display_text
+        return str(self.city)  # Return the numeric value if not found in choices
 
     
 
@@ -28,6 +32,11 @@ class Address(models.Model):
     name = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False, db_index=True)
 
     location_details = models.TextField()
+    
 
-    def __str__(self) -> str:
-        return f"{self.name}"
+    def __str__(self):
+        # Loop through the AREA_OR_CENTER_CHOICES to find the corresponding string value
+        for value, display_text in AREA_OR_CENTER_CHOICES:
+            if value == self.name:
+                return display_text
+        return str(self.name)  # Return the numeric value if not found in choices
