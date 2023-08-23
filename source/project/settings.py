@@ -27,6 +27,11 @@ ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
 
 INSTALLED_APPS = [
+
+    # ...
+    'cloudinary_storage',
+    # ...
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -54,6 +59,10 @@ INSTALLED_APPS = [
     'django_seed',  # for seeding the database
 
     "django.contrib.postgres", # for postgres search
+
+    # ...
+    'cloudinary',
+    # ...
 ]
 
 
@@ -225,11 +234,25 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 
 # PRODUCTION STATIC FILES
-S3_STATIC_DIR = "static"
-STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{S3_STATIC_DIR}/static/"
-STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
-STATIC_FILES_DIRS = [BASE_DIR / "static",]
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# S3_STATIC_DIR = "static"
+# STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{S3_STATIC_DIR}/static/"
+# STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_FILES_DIRS = [BASE_DIR / "static",]
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+# PRODUCTION STATIC-MEDIA FILES ON CLOUDINARY
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'), 
+    'API_KEY': os.environ.get('API_KEY'),
+    'API_SECRET': os.environ.get('API_SECRET'),
+    # 'API_ENVIRONMENT_VARIABLE':  ,
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
 # Loacl media files
@@ -238,9 +261,9 @@ STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 # PRODUCTION MEDIA FILES
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
