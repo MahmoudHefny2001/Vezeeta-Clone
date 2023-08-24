@@ -241,20 +241,6 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 # STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
-# PRODUCTION STATIC-MEDIA FILES ON CLOUDINARY
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUD_NAME'), 
-    'API_KEY': os.environ.get('API_KEY'),
-    'API_SECRET': os.environ.get('API_SECRET'),
-    # 'API_ENVIRONMENT_VARIABLE':  ,
-}
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATIC_URL = '/static/'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
-
-
 # Loacl media files
 # MEDIA_URL = "/media/"
 # MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
@@ -264,6 +250,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 # MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 # MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+
+# 
+# # PRODUCTION STATIC-MEDIA FILES ON CLOUDINARY
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'), 
+    'API_KEY': os.environ.get('API_KEY'),
+    'API_SECRET': os.environ.get('API_SECRET'),
+}
+
+# Media files (user uploads)
+MEDIA_URL = '/vezeeta/media/'  # or any prefix you choose
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Static files
+STATIC_URL = '/vezeeta/static/'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+# #
+
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
