@@ -235,8 +235,8 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 # Railway Volume static files
 STATIC_URL = "/vezeeta/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_FILES_DIRS = [BASE_DIR / "static",]
+STATIC_ROOT = os.path.join(BASE_DIR, 'vezeeta/static')
+STATIC_FILES_DIRS = [BASE_DIR / "vezeeta/static",]
 
 
 # PRODUCTION STATIC FILES
@@ -254,7 +254,7 @@ STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 # Railway Volume media files
 MEDIA_URL = "vezeeta/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_ROOT = os.path.join(BASE_DIR, "vezeeta/media/")
 
 
 # PRODUCTION MEDIA FILES
