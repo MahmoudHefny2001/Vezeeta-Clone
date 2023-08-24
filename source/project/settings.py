@@ -228,9 +228,9 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 
 # Local static files
-# STATIC_URL = "static/"
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATIC_FILES_DIRS = [BASE_DIR / "static",]
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
 # PRODUCTION STATIC FILES
@@ -242,8 +242,8 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 
 # Loacl media files
-# MEDIA_URL = "/media/"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
 # PRODUCTION MEDIA FILES
@@ -252,23 +252,22 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 # DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
-
 # 
-# # PRODUCTION STATIC-MEDIA FILES ON CLOUDINARY
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUD_NAME'), 
-    'API_KEY': os.environ.get('API_KEY'),
-    'API_SECRET': os.environ.get('API_SECRET'),
-}
+# # # PRODUCTION STATIC-MEDIA FILES ON CLOUDINARY
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': os.environ.get('CLOUD_NAME'), 
+#     'API_KEY': os.environ.get('API_KEY'),
+#     'API_SECRET': os.environ.get('API_SECRET'),
+# }
 
-# Media files (user uploads)
-MEDIA_URL = '/vezeeta/media/'  # or any prefix you choose
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# # Media files (user uploads)
+# MEDIA_URL = '/vezeeta/media/'  # or any prefix you choose
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Static files
-STATIC_URL = '/vezeeta/static/'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
-# #
+# # Static files
+# STATIC_URL = '/vezeeta/static/'
+# STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+# # 
 
 
 
