@@ -229,7 +229,7 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 # As Production
 # static files
-STATIC_URL = "static/"
+STATIC_URL = "/files/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
@@ -248,7 +248,7 @@ STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
 # As production
-MEDIA_URL = "/media/"
+MEDIA_URL = "/files/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
