@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-# DEBUG = True
+DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -226,6 +226,9 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
+
+RAILWAY_VOLUME_NAME = os.environ.get("RAILWAY_VOLUME_NAME")
+RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 # As Production
 # static files
