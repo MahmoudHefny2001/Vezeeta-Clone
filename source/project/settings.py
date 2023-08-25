@@ -250,7 +250,7 @@ RAILWAY_VOLUME_NAME = str(os.environ.get("RAILWAY_VOLUME_NAME"))
 RAILWAY_VOLUME_MOUNT_PATH = str(os.environ.get("RAILWAY_VOLUME_MOUNT_PATH"))
 
 # Configure static files serving
-RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'static')
 
