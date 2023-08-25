@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-DEBUG = True
+# DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -232,7 +232,7 @@ RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 # As Production
 # static files
-STATIC_URL = "/files/static/"
+STATIC_URL = f"{RAILWAY_VOLUME_NAME}/{RAILWAY_VOLUME_MOUNT_PATH}/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
@@ -251,7 +251,7 @@ STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
 # As production
-MEDIA_URL = "/files/media/"
+MEDIA_URL = f"{RAILWAY_VOLUME_NAME}/{RAILWAY_VOLUME_MOUNT_PATH}/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
