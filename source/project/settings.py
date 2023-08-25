@@ -252,11 +252,11 @@ RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 # Configure static files serving
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Configure media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
