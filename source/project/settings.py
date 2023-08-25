@@ -228,13 +228,21 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
 
 # Local static files
-STATIC_URL = "static/"
+# STATIC_URL = "static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_FILES_DIRS = [BASE_DIR / "static",]
+
+
+# As Production
+# static files
+STATIC_URL = "/files/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
-RAILWAY_VOLUME_NAME = os.environ.get("RAILWAY_VOLUME_NAME")
-RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
+
+# RAILWAY_VOLUME_NAME = os.environ.get("RAILWAY_VOLUME_NAME")
+# RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 # PRODUCTION STATIC FILES
 # S3_STATIC_DIR = "static"
@@ -245,8 +253,13 @@ RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 
 # Loacl media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+# MEDIA_URL = "/media/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+
+
+# As production
+# MEDIA_URL = "/files/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
 # PRODUCTION MEDIA FILES
