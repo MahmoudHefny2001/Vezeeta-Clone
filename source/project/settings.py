@@ -258,8 +258,8 @@ STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 
 # As production
-# MEDIA_URL = "/files/"
-# MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_URL = "/files/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 
 
 # PRODUCTION MEDIA FILES
