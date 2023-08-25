@@ -253,10 +253,12 @@ RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
 # Configure media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'media')
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
