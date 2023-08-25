@@ -20,17 +20,13 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-DEBUG = True
+# DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
 
 INSTALLED_APPS = [
-
-    # ...
-    'cloudinary_storage',
-    # ...
 
     "django.contrib.admin",
     "django.contrib.auth",
@@ -60,9 +56,7 @@ INSTALLED_APPS = [
 
     "django.contrib.postgres", # for postgres search
 
-    # ...
-    'cloudinary',
-    # ...
+    
 ]
 
 
@@ -239,10 +233,6 @@ STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_FILES_DIRS = [BASE_DIR / "static",]
 
-
-
-# RAILWAY_VOLUME_NAME = os.environ.get("RAILWAY_VOLUME_NAME")
-# RAILWAY_VOLUME_MOUNT_PATH = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 # PRODUCTION STATIC FILES
 # S3_STATIC_DIR = "static"
