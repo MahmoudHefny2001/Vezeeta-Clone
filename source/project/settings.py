@@ -141,6 +141,8 @@ SIMPLE_JWT = {
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  ##
 
+    'whitenoise.middleware.WhiteNoiseMiddleware',  ##
+
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -173,6 +175,7 @@ WSGI_APPLICATION = "project.wsgi.application"
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000/',
     "https://vezeeta-clone-production.up.railway.app",
+    "https://*.up.railway.app",
 ]
 
 DATABASES = {
@@ -249,17 +252,14 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 RAILWAY_VOLUME_NAME = str(os.environ.get("RAILWAY_VOLUME_NAME"))
 RAILWAY_VOLUME_MOUNT_PATH = str(os.environ.get("RAILWAY_VOLUME_MOUNT_PATH"))
 
-# Configure static files serving
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'static')
-STATIC_FILES_DIRS = [BASE_DIR / "static",]
-STATIC_FILES_STORAGES = 'storages.backends.s3boto3.S3Boto3Storage'
 
-# Configure media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(RAILWAY_VOLUME_MOUNT_PATH, 'media')
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# Media Files (uploaded from users)
+MEDIA_URL = "media/"
+MEDIA_ROOT = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
