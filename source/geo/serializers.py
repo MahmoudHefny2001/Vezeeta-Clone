@@ -32,10 +32,12 @@ class AddressSerializer(serializers.ModelSerializer):
 
     def get_address(self, obj):
         return dict(AREA_OR_CENTER_CHOICES).get(obj.name, '')
+    
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['name'] = self.get_address(instance)
+        
         return representation
     
 
@@ -50,7 +52,12 @@ class GeoAddressSerializer(serializers.ModelSerializer):
     def get_address(self, obj):
         return dict(AREA_OR_CENTER_CHOICES).get(obj.name, '')
 
+    
+    def get_location_code(self, obj):
+        return obj.name
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['name'] = self.get_address(instance)
+        representation['location'] = self.get_location_code(instance)
         return representation
