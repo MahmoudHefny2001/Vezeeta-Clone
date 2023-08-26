@@ -21,6 +21,35 @@ class LocationSerializer(serializers.ModelSerializer):
         return representation
 
 
+
+class GeoLocationSerializer(serializers.ModelSerializer):
+
+    code = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Location
+        # fields = "__all__"
+        exclude = ('id',)
+
+
+    def get_code(self, obj):
+        # Loop through CITY_CHOICES to find the code corresponding to the city
+        for value, display_text in CITY_CHOICES:
+            if value == obj.city:
+                return value
+        return None  # Return None if not found in choices
+
+    
+    def get_city(self, obj):
+        return dict(CITY_CHOICES).get(obj.city, '')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['city'] = self.get_city(instance)
+        representation['code'] = self.get_code(instance)
+        return representation
+
+
 class AddressSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
 

@@ -30,7 +30,7 @@ class Address(models.Model):
     location = models.ForeignKey(Location, on_delete=models.SET_DEFAULT, default=1)
 
     name = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False, db_index=True)
-
+    
     location_details = models.TextField()
     
 

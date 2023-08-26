@@ -1,3 +1,4 @@
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
@@ -10,6 +11,8 @@ from . import models, serializers
 from django_filters.rest_framework import DjangoFilterBackend 
 from rest_framework import filters
 from rest_framework_word_filter import FullWordSearchFilter
+from rest_framework import generics
+
 
 
 class AddressViewSet(ModelViewSet):
@@ -59,3 +62,21 @@ class AddressViewSet(ModelViewSet):
             queryset = queryset.filter(location__city=city)
 
         return queryset.order_by('location__city', 'name').distinct('location__city', 'name')
+    
+
+
+class CitiesListView(generics.ListAPIView):
+    queryset = models.Location.objects.all()
+    serializer_class = serializers.GeoLocationSerializer
+    permission_classes = [AllowAny,]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+    # Make Allowed methods to be only GET and HEAD
+    http_method_names = ['get', 'head', 'options']
+
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        return queryset.order_by('city', 'id').distinct('city')
+    
