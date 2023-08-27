@@ -29,10 +29,10 @@ class PatientSerializer(serializers.ModelSerializer):
             "name",
             "phone_number",
             "email",
-            "gender",
-            "birth_date",
+            # "gender",
+            # "birth_date",
             "password",
-            "has_medical_insurance",
+            # "has_medical_insurance",
         )
 
     def create(self, validated_data):
@@ -40,12 +40,12 @@ class PatientSerializer(serializers.ModelSerializer):
         return patient
 
 
-    def update(self, instance, validated_data):
-        # Allow partial updates
-        instance.name = validated_data.get("name", instance.name)
-        instance.has_medical_insurance = validated_data.get("has_medical_insurance", instance.has_medical_insurance)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     # Allow partial updates
+    #     instance.name = validated_data.get("name", instance.name)
+    #     instance.has_medical_insurance = validated_data.get("has_medical_insurance", instance.has_medical_insurance)
+    #     instance.save()
+    #     return instance
 
 class OuterViewPatientSerializer(serializers.ModelSerializer):
     class Meta:
