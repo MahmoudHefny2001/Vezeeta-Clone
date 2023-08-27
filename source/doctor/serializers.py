@@ -8,9 +8,14 @@ from review.models import Review
 from geo.serializers import LocationSerializer, AddressSerializer
 from specialization.serializers import SpecializationSerializer
 
+from specialization.models import Specialization
+from geo.models import Location, Address
 
 class DoctorSerializer(serializers.ModelSerializer):
     
+    specialization = SpecializationSerializer()
+    address = AddressSerializer()
+
     password = serializers.CharField(write_only=True)
 
     class Meta:
@@ -26,22 +31,33 @@ class DoctorSerializer(serializers.ModelSerializer):
             "gender",
             "birth_date",
             "appointment_price" ,
-            "specialization",
             "clinic_number",
+            "specialization",
             "address",
         )
+        # extra_kwargs = {
+            # 'birth_date': {'required': False},
+        # }
 
     
     def create(self, validated_data):
-        specialization = validated_data.pop("specialization")
-        address = validated_data.pop("address")
+        try:
+            specialization_data = validated_data.pop("specialization")
+            address_data = validated_data.pop('address')
+            location_data = address_data.pop('location')
 
-        doctor = DoctorExtended.objects.create_user(
-            specialization=specialization,
-            address=address,
-            **validated_data
-        )
-        return doctor
+            location_instance, created = Location.objects.get_or_create(**location_data)
+            address_instance = Address.objects.create(location=location_instance, **address_data)
+            specialization_instance = Specialization.objects.create(**specialization_data)
+
+            doctor = DoctorExtended.objects.create_user(
+                address=address_instance, 
+                specialization=specialization_instance, 
+                **validated_data
+            )
+            return doctor
+        except Exception as e:
+            raise e
 
 
 

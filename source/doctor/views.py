@@ -57,24 +57,13 @@ class DoctorRegistrationView(views.APIView):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     
-
     def post(self, request):
-        # try:
-        #     serializer = DoctorSerializer(data=request.data)
-        #     serializer.is_valid(raise_exception=True)
+        serializer = DoctorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        #     # Make sure you pass the specialization choice correctly in the data
-        #     specialization_choice = request.data.get("specialization")
-        #     if specialization_choice not in dict(DoctorExtended.SPECIAIALIZATION_CHOICES):
-        #         return Response({"error": "Invalid specialization choice"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        #     serializer.save(specialization=specialization_choice)  # Save specialization
-            
-        #     return Response(serializer.data)
-        # except Exception as e:
-        #     print(e)
-        #     raise e
-        pass
 
 
 class LoginView(views.APIView):
@@ -190,6 +179,8 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        queryset = queryset.select_related('doctor__address', 'doctor__address__location', 'doctor__specialization')
 
         specialization = self.request.query_params.get('specialization', None)
         city = self.request.query_params.get('city', None)
