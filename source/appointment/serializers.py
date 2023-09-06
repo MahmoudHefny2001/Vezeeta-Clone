@@ -3,40 +3,54 @@ from patient.serializers import PatientSerializer, OuterViewPatientSerializer
 from doctor.serializers import (
     DoctorProfileSerializer,
     # OuterViewDoctorProfileSerializer,
-    # AppointmentOuterViewDoctorProfileSerializer,
+    # OuterViewDoctorProfileSerializer,
+    AppointmentOuterViewDoctorProfileSerializer,
 )
 from doctor.models import DoctorProfile
 from .models import Appointment
 from django.shortcuts import get_object_or_404
 from patient.models import PatientExtended
+from timeslot.models import TimeSlot
+from timeslot.serializers import TimeSlotSerializer, TimeSlotSerializerForPatients
 
 
-class AppointmentSerializer(serializers.ModelSerializer):
-    # doctor_profile = DoctorProfileSerializer(read_only=True)
-    # doctor_profile = AppointmentOuterViewDoctorProfileSerializer(read_only=True)
-
-    user = OuterViewPatientSerializer(read_only=True)
-    # location = LocationSerializer(read_only=True)
+class FullAppointmentSerializer(serializers.ModelSerializer):
+    time_slot = TimeSlotSerializerForPatients()
+    
 
     class Meta:
         model = Appointment
-        fields = ("doctor_profile", "user", "examination_price", "time", "created", "updated")
-        read_only_fields = (
-            "examination_price",
-        )  # Exclude fields from write operations
+        # fields = '__all__'
+        exclude = ('modified',)
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['patient'] = OuterViewPatientSerializer(instance.patient).data
+         
+        return representation
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'
+        # exclude = ('id', 'doctor_profile', )
 
     def create(self, validated_data):
-        doctor_profile_id = self.context["view"].kwargs["doctor_profile_id"]
-        doctor_profile = get_object_or_404(DoctorProfile, id=doctor_profile_id)
-        user = self.context["request"].user
+        doctor_profile_id = self.validated_data.pop('doctor_profile_id')
 
-        # Retrieve the CustomUserExtended instance based on the user object
-        custom_user = get_object_or_404(PatientExtended, id=user.id)
+        user = self.request.user
+        print(user)
+        patient = PatientExtended.objects.get(id=user.id)
+        print(patient)
+
+        time_slot_id = self.validated_data.pop('time_slot_id')
+
+        timeslot = TimeSlot.objects.get(id=time_slot_id, doctor_profile_id=doctor_profile_id)
 
         appointment = Appointment.objects.create(
-            doctor_profile=doctor_profile,
-            user=custom_user,
-            examination_price=doctor_profile.examination_price,
+            patient=patient,
+            time_slot=timeslot,
+            **validated_data
         )
-
         return appointment

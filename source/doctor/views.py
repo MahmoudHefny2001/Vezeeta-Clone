@@ -32,7 +32,6 @@ from rest_framework import filters
 from review.models import Review
 from review.serializers import ReviewSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from rest_framework.pagination import PageNumberPagination
 from .permissions import IsProfileOwner
 from django_filters.rest_framework import DjangoFilterBackend 
  
@@ -40,15 +39,12 @@ from django.db.models import Q
 
 from rest_framework_word_filter import FullWordSearchFilter
 
+from .pagination import DoctorListPagination
 
 # from .filters import CityFilterBackend
 
-
-class DoctorListPagination(PageNumberPagination):
-    page_size = 10  # Number of results per page
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
+from specialization.choices import SPECIAIALIZATION_CHOICES
+from geo.choices import CITY_CHOICES, AREA_OR_CENTER_CHOICES 
 
 
 class DoctorRegistrationView(views.APIView):
@@ -131,28 +127,28 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
 
     word_fields = (
-        'doctor__full_name',
-        'doctor__specialization__specialization',
+        # 'doctor__full_name',
+        # 'doctor__specialization__specialization',
         'doctor__qualifications',
         'doctor__address__name',
         'doctor__address__location__city',
     )
 
     filterset_fields = [
-        'doctor__full_name',
+        # 'doctor__full_name',
         'doctor__address__name',
         'doctor__address__location__city',
-        'doctor__specialization__specialization',
+        # 'doctor__specialization__specialization',
         'doctor__qualifications',    
     ] 
 
     
     search_fields = [  
-        'doctor__specialization__specialization',
-        'doctor__address__name',
-        'doctor__address__location__city',
-        'doctor__full_name',
-        'doctor__qualifications',
+        '@doctor__specialization__specialization',
+        '@doctor__address__name',
+        '@doctor__address__location__city',
+        '@doctor__full_name',
+        '@doctor__qualifications',
     ]   
 
 
@@ -173,26 +169,66 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     
 
-    def get_object(self):    
-        return super().get_object()
+    # def get_object(self):    
+        # return super().get_object()
 
 
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.select_related('doctor__address', 'doctor__address__location', 'doctor__specialization')
+        queryset = queryset.prefetch_related('available_time_slots').select_related('doctor')
 
-        specialization = self.request.query_params.get('specialization', None)
-        city = self.request.query_params.get('city', None)
-        area = self.request.query_params.get('area', None)
-        if specialization is not None:
-            queryset = queryset.filter(doctor__specialization__specialization=specialization)
-        if city is not None:
-            queryset = queryset.filter(doctor__address__location__city=city)
-        if area is not None:
-            queryset = queryset.filter(doctor__address__name=area)
+        doctor_name = self.request.query_params.get('doctor_full_name', None)
+        
+        doctor_specialization = self.request.query_params.get('doctor_specialization', None)
+        
+        full_text_search = self.request.query_params.get('text_search', None)
 
-        return self.queryset.order_by("id")
+        doctor_city = self.request.query_params.get('doctor_city', None)
+        doctor_area = self.request.query_params.get('doctor_area', None)
+
+        # Create Q objects for each query parameter
+        conditions = Q()
+
+        if doctor_name:
+            conditions |= Q(doctor__full_name__icontains=doctor_name)
+
+
+        if doctor_specialization:
+            
+            for specialization in SPECIAIALIZATION_CHOICES:
+                if doctor_specialization.lower() == specialization[1].lower():
+                    doctor_specialization = specialization[0]
+                    print(doctor_specialization)
+                    queryset = queryset.filter(doctor__specialization__specialization=doctor_specialization)
+
+        if doctor_city:
+            for city in CITY_CHOICES:
+                if doctor_city.lower == city[1].lower():
+                    doctor_city = city[0]
+                    queryset = queryset.filter(doctor__address__location__city=doctor_city)
+
+
+        if doctor_area:
+            for area in AREA_OR_CENTER_CHOICES:
+                if doctor_area.lower == area[1].lower():
+                    doctor_area = area[0]
+                    queryset = queryset.filter(doctor__address__name=doctor_area)
+
+
+    
+        # if specialization is not None:
+        #     queryset = queryset.filter(doctor__specialization__specialization=specialization)
+        # if city is not None:
+        #     queryset = queryset.filter(doctor__address__location__city=city)
+        # if area is not None:
+        #     queryset = queryset.filter(doctor__address__name=area)
+
+        if conditions:
+            queryset = queryset.filter(conditions).order_by('id')
+            
+
+        return queryset.order_by('id')
 
 
 
@@ -260,3 +296,24 @@ class ChangePasswordView(generics.UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+# from django.http import JsonResponse
+
+# def get_doctor_profile(request, doctor_profile_id):
+#     try:
+#         doctor_profile = DoctorProfile.objects.get(pk=doctor_profile_id)
+#     except DoctorProfile.DoesNotExist:
+#         return JsonResponse({"error": "Doctor profile not found"}, status=404)
+
+#     # Serialize the data
+#     serializer = OuterViewDoctorProfileSerializer(doctor_profile)
+    
+#     # Print the serialized data and queryset for debugging
+#     print("Serialized Data:", serializer.data)
+#     print("Queryset:", DoctorProfile.objects.all().query)  # Query used to retrieve data
+
+#     return JsonResponse(serializer.data)
+

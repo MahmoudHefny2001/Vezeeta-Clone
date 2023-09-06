@@ -15,6 +15,8 @@ from geo.models import Location, Address
 
 from specialization.models import Specialization
 
+# from timeslot.models import TimeSlot
+
 
 class Doctor(Person):
     base_role = Person.Role.DOCTOR
@@ -26,7 +28,7 @@ class Doctor(Person):
 
 
 class DoctorExtended(Doctor):
-
+    
     image = models.ImageField(upload_to="doctors/images", null=True, blank=True)
     
     full_name = models.CharField(max_length=100, null=False, blank=False)
@@ -42,7 +44,10 @@ class DoctorExtended(Doctor):
     address = models.ForeignKey(Address, on_delete=models.SET_DEFAULT, null=False, blank=False, default=1)
 
     def __str__(self):
-        return f"{self.full_name}"
+        return f"{self.id} - {self.full_name}"
+    
+    
+
 
 
     class Meta:
@@ -56,4 +61,9 @@ class DoctorProfile(models.Model):
 
     doctor = models.OneToOneField(DoctorExtended, on_delete=models.CASCADE)
 
-   
+    
+    
+    # waiting_duration = models.CharField(max_length=100)
+
+    def __str__(self) -> str:
+        return f"profile {self.id} of {self.doctor.full_name}"

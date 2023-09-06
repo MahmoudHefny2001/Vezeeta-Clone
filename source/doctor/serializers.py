@@ -11,6 +11,11 @@ from specialization.serializers import SpecializationSerializer
 from specialization.models import Specialization
 from geo.models import Location, Address
 
+from timeslot.serializers import TimeSlotSerializer
+
+from timeslot.models import TimeSlot
+
+
 class DoctorSerializer(serializers.ModelSerializer):
     
     specialization = SpecializationSerializer()
@@ -65,7 +70,6 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
 
     specialization = SpecializationSerializer()
 
-    # area_or_center = AreaOrCenterSerializer()
     address = AddressSerializer()
 
     class Meta:
@@ -80,20 +84,48 @@ class OuterViewDoctorSerializer(serializers.ModelSerializer):
             "specialization",
             "clinic_number",
         )
-    
+
 
 class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
+
     doctor = OuterViewDoctorSerializer(read_only=True)
+
+    availability = TimeSlotSerializer(many=True, read_only=True, allow_null=True, required=False)
+
+
+    def get_availability_data(self, obj):
+        time_slots = TimeSlot.objects.filter(doctor_profile=obj)
+        time_slots_data = TimeSlotSerializer(time_slots, many=True).data
+        return time_slots_data
+    
+
+    def to_representation(self, instance):
+        
+        representation = super().to_representation(instance)
+        availability_data = self.get_availability_data(instance)
+        representation['availability'] = availability_data
+        return representation
+
 
     class Meta:
         model = DoctorProfile
-        fields = ("id", "doctor",)
+        fields = ("id", "doctor", "availability",) 
+        read_only_fields = ('doctor', 'availability', )
+
+
+    
+    def get_availability(self, obj):
+        return obj.available_time_slots.all()
+
 
 
 class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
     doctor = OuterViewDoctorSerializer(read_only=True)
     
+    availability = TimeSlotSerializer(many=True, allow_null=True, required=False)
+
+
     class Meta:
         model = DoctorProfile
         fields = '__all__'
@@ -113,4 +145,32 @@ class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        return representation
+
+
+
+class DoctorProfileSerialzerForAppointmentDisplay(serializers.ModelSerializer):
+    doctor = DoctorSerializer(read_only=True)
+    class Meta:
+        model = DoctorProfile
+        fields = "__all__"
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation
+
+
+
+class AppointmentOuterViewDoctorProfileSerializer(serializers.ModelSerializer):
+    doctor = OuterViewDoctorProfileSerializer(read_only=True)
+    
+    class Meta:
+        model = DoctorProfile
+        fields = "__all__"
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
         return representation
