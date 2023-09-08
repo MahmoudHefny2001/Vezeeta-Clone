@@ -5,9 +5,10 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r"", views.DoctorProfileViewSet, basename="doctor")
 
+router.register(r"profiles", views.DoctorProfileViewSetForDoctors, basename="profiles")
 
+urlpatterns = [    
 
-urlpatterns = [
     path("sign-up/", views.DoctorRegistrationView.as_view(), name="doctor-registration"),
     path("login/", views.LoginView.as_view(), name="doctor-login"),
     path("logout/", views.Logout.as_view(), name="doctor-logout"),

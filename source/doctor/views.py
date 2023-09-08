@@ -109,6 +109,15 @@ class LoginView(views.APIView):
             )
 
 
+class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
+    queryset = DoctorProfile.objects.all()
+    permission_classes = [IsAuthenticatedOrReadOnly, IsProfileOwner]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+    serializer_class = DoctorProfileSerializer
+
+    
+
 class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = DoctorListPagination
 
