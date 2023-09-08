@@ -15,9 +15,10 @@ class TimeSlotView(viewsets.ModelViewSet):
     permission_classes = [IsAppointmentOwner]
 
 
-    def get_queryset(self):
+    def get_queryset(self, id=None):
         doctor = self.request.user
-        doctor = DoctorExtended.objects.get(id=doctor.id)
+        print(doctor.id)
+        doctor = DoctorExtended.objects.get(id=id)
         doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
         return TimeSlot.objects.filter(doctor_profile=doctor_profile)
     

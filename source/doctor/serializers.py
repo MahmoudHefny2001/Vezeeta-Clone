@@ -64,8 +64,23 @@ class DoctorSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise e
 
-    
-    
+
+
+    def update(self, instance, validated_data):
+        email = validated_data.get("email", None)
+        phone_number = validated_data.get("phone_number", None)
+        password = validated_data.get("password", None)
+        
+        if email is not None:
+            instance.email = email
+        if phone_number is not None:
+            instance.phone_number = phone_number
+        if password is not None:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
+
 
 
 class OuterViewDoctorSerializer(serializers.ModelSerializer):    
@@ -136,6 +151,8 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)
+
+    # doctor = DoctorSerializerForDoctors(read_only=True)
 
     class Meta:
         model = DoctorProfile
