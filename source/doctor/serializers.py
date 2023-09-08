@@ -64,6 +64,8 @@ class DoctorSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise e
 
+    
+    
 
 
 class OuterViewDoctorSerializer(serializers.ModelSerializer):    
@@ -142,6 +144,7 @@ class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     def create(self, validated_data):
         doctor_profile = DoctorProfile.objects.create(**validated_data)
         return doctor_profile
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)

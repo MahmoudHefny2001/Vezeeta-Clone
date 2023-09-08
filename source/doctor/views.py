@@ -11,6 +11,8 @@ from .serializers import (
     DoctorProfileSerializer,
     OuterViewDoctorSerializer,
     OuterViewDoctorProfileSerializer,
+    DoctorProfileSerializerForDoctors,
+    DoctorProfileSerialzerForAppointmentDisplay,
 
 )
 from rest_framework.permissions import (
@@ -32,7 +34,7 @@ from rest_framework import filters
 from review.models import Review
 from review.serializers import ReviewSerializer
 from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
-from .permissions import IsProfileOwner
+from .permissions import IsObjectOwnerOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend 
  
 from django.db.models import Q
@@ -46,6 +48,12 @@ from .pagination import DoctorListPagination
 from specialization.choices import SPECIAIALIZATION_CHOICES
 from geo.choices import CITY_CHOICES, AREA_OR_CENTER_CHOICES 
 
+from rest_framework.permissions import SAFE_METHODS
+
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly, IsAdminUser, 
+    IsAuthenticated, AllowAny, 
+)
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny,]
@@ -109,14 +117,7 @@ class LoginView(views.APIView):
             )
 
 
-class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
-    queryset = DoctorProfile.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly, IsProfileOwner]
-    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
-    serializer_class = DoctorProfileSerializer
-
-    
 
 class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = DoctorListPagination
@@ -173,7 +174,7 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
             return [permissions.AllowAny()]
         else:
             # Only authenticated users can perform other actions
-            return [permissions.IsAdminUser(), IsProfileOwner()]
+            return [permissions.IsAdminUser(), IsObjectOwnerOrReadOnly()]
 
 
     
@@ -240,6 +241,37 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset.order_by('id')
 
 
+
+class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
+    queryset = DoctorProfile.objects.all()
+    serializer_class = DoctorProfileSerializerForDoctors
+    authentication_classes = [JWTAuthentication,]
+    permission_classes = [IsObjectOwnerOrReadOnly,]
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [IsObjectOwnerOrReadOnly()]
+    
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        doctor_data = request.data.pop('doctor', {})  # Extract user data from the request
+        doctor_serializer = DoctorSerializer(instance.doctor, data=doctor_data, partial=True)
+        doctor_profile_serializer = self.get_serializer(instance, data=request.data, partial=True)        
+        
+        if doctor_serializer.is_valid() and doctor_profile_serializer.is_valid():
+            doctor_serializer.save()
+            doctor_profile_serializer.save()
+            return Response(doctor_profile_serializer.data)
+        else:
+            errors = {
+                'doctor_errors': doctor_serializer.errors,
+                'profile_errors': doctor_profile_serializer.errors
+            }
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Logout(views.APIView):
