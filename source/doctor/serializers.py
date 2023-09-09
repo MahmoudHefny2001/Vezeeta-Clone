@@ -37,6 +37,7 @@ class DoctorSerializer(serializers.ModelSerializer):
             "birth_date",
             "appointment_price" ,
             "clinic_number",
+            
             "specialization",
             "address",
         )
@@ -73,14 +74,32 @@ class DoctorSerializer(serializers.ModelSerializer):
         appointment_price = validated_data.get("appointment_price", None)
         clinic_number = validated_data.get("clinic_number", None)
 
+        birth_date = validated_data.get("birth_date", None)
+
         email = validated_data.get("email", None)
         phone_number = validated_data.get("phone_number", None)
         password = validated_data.get("password", None)
         
+        address = validated_data.get("address", None)
+        specialization = validated_data.get("specialization", None)
+
+        if address is not None:
+            location_data = address.pop('location')
+            location_instance, created = Location.objects.get_or_create(**location_data)
+            address_instance = Address.objects.create(location=location_instance, **address)
+            instance.address = address_instance
+        
+        if specialization is not None:
+            specialization_instance = Specialization.objects.create(**specialization)
+            instance.specialization = specialization_instance
+
+
         if full_name is not None:
             instance.full_name = full_name
         if image is not None:
             instance.image = image
+        if birth_date is not None:
+            instance.birth_date = birth_date
         if qualifications is not None:
             instance.qualifications = qualifications
         if appointment_price is not None:
