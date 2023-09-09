@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  app:
+    network_mode: host
+    build: .
+    volumes:
+      - .:/source
+    image: app:vezeeta
+    container_name: vezeeta_container
+    # command:  sh -c "python3 manage.py makemigrations && python3 manage.py migrate && gunicorn --bind 0.0.0.0:8000 core.wsgi"
+    command:  sh -c "gunicorn --bind 0.0.0.0:8000 project.wsgi"    
+    env_file:
+      - .env
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DB_NAME=${DATABASE_NAME}
+      - DB_USER=${DATABASE_USER}
+      - DB_PASSWORD=${DATABASE_PASSWORD}
+      - DB_HOST=${DATABASE_HOST} 
+      - DB_PORT=${DATABASE_PORT}

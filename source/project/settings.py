@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-DEBUG = True
+# DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
@@ -34,11 +34,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "corsheaders",  #
     "rest_framework",  #
     "django_filters",  #
     "django_extensions",  #
     "rest_framework_simplejwt.token_blacklist",  #
+    
     "person",  ###
     "patient",  #
     "insurance",  #
@@ -48,11 +50,9 @@ INSTALLED_APPS = [
     "specialization",   #
     "geo",   #
     "timeslot",  #
-    
     "medical_insurance_firm",  #
 
     'rest_framework_word_filter',
-
     'django_seed',  # for seeding the database
 
     "django.contrib.postgres", # for postgres search
