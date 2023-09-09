@@ -67,10 +67,26 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
+        full_name = validated_data.get("full_name", None)
+        image = validated_data.get("image", None)
+        qualifications = validated_data.get("qualifications", None)
+        appointment_price = validated_data.get("appointment_price", None)
+        clinic_number = validated_data.get("clinic_number", None)
+
         email = validated_data.get("email", None)
         phone_number = validated_data.get("phone_number", None)
         password = validated_data.get("password", None)
         
+        if full_name is not None:
+            instance.full_name = full_name
+        if image is not None:
+            instance.image = image
+        if qualifications is not None:
+            instance.qualifications = qualifications
+        if appointment_price is not None:
+            instance.appointment_price = appointment_price
+        if clinic_number is not None:
+            instance.clinic_number = clinic_number
         if email is not None:
             instance.email = email
         if phone_number is not None:

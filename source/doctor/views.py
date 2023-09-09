@@ -55,6 +55,10 @@ from rest_framework.permissions import (
     IsAuthenticated, AllowAny, 
 )
 
+from specialization.serializers import SpecializationSerializer
+from geo.serializers import AddressSerializer
+
+
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny,]
     
@@ -258,37 +262,34 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        doctor_data = request.data.pop('doctor', {})  # Extract user data from the request
+        
+        doctor_data = request.data.get('doctor', {})  # Access 'doctor' directly
 
-        specialization_data = request.data.pop('specialization', {})
-        address_data = request.data.pop('address', {})
-
-        from specialization.serializers import SpecializationSerializer
-        from geo.serializers import AddressSerializer
+        specialization_data = doctor_data.get('specialization', {})  # Access 'specialization' within 'doctor'
+        address_data = doctor_data.get('address', {})  # Access 'address' within 'doctor'
 
         specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization_data, partial=True)
         address_serializer = AddressSerializer(instance.doctor.address, data=address_data, partial=True)
 
-
-
         doctor_serializer = DoctorSerializer(instance.doctor, data=doctor_data, partial=True)
-        doctor_profile_serializer = self.get_serializer(instance, data=request.data, partial=True)        
-        
-        if doctor_serializer.is_valid() and doctor_profile_serializer.is_valid() and specialization_serializer.is_valid() and address_serializer.is_valid():
-            doctor_serializer.save()
+        doctor_profile_serializer = self.get_serializer(instance, data=request.data, partial=True)
 
-            specialization_serializer.save()
-            address_serializer.save()
+        if doctor_serializer.is_valid() and doctor_profile_serializer.is_valid():
+            doctor_serializer.save()
+            
+            if specialization_serializer.is_valid():
+                specialization_serializer.save()
+        
+            if address_serializer.is_valid():
+                address_serializer.save()
 
             doctor_profile_serializer.save()
             return Response(doctor_profile_serializer.data)
         else:
             errors = {
                 'doctor_errors': doctor_serializer.errors,
-
                 'specialization_errors': specialization_serializer.errors,
                 'address_errors': address_serializer.errors,
-
                 'profile_errors': doctor_profile_serializer.errors
             }
             return Response(errors, status=status.HTTP_400_BAD_REQUEST)
