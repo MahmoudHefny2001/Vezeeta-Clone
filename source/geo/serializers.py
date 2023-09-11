@@ -59,6 +59,15 @@ class AddressSerializer(serializers.ModelSerializer):
         exclude = ('id',)
 
 
+    def update(self, instance, validated_data):
+        location_data = validated_data.pop('location')
+        location_instance, created = Location.objects.get_or_create(**location_data)
+        instance.location = location_instance
+        instance.name = validated_data.get('name', instance.name)
+        instance.save()
+        return instance
+
+
     def get_address(self, obj):
         return dict(AREA_OR_CENTER_CHOICES).get(obj.name, '')
     

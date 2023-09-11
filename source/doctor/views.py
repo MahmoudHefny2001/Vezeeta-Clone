@@ -255,8 +255,8 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
 
 
     def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [permissions.AllowAny()]
+        # if self.request.method in SAFE_METHODS:
+            # return [permissions.AllowAny()]
         return [IsObjectOwnerOrReadOnly()]
     
 
