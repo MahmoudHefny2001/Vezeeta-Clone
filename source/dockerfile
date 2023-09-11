@@ -1,0 +1,26 @@
+# Use an official Python runtime as the base image
+FROM python:3.8.3-alpine
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set the working directory in the container
+WORKDIR /source
+
+# Install system dependencies for Pillow and building Python extensions
+RUN apk update && \
+    apk add --no-cache jpeg-dev zlib-dev gcc musl-dev
+
+# Copy the requirements file into the container
+COPY requirements.txt requirements.txt
+
+# Install the Python dependencies, including psycopg2-binary
+RUN python -m pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy the Django project code into the container
+COPY . .
+
+# Run the Django development server when the container starts
+CMD ["python3", "manage.py", "runserver"]

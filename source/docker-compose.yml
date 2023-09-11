@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/source
+    image: app:vezeeta
+    container_name: vezeeta_container
+    command: sh -c "pip3 install -r requirements.txt && python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver"
+    env_file:
+      - .env

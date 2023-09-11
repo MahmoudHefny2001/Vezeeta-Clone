@@ -13,4 +13,6 @@ class Specialization(models.Model):
     medical_speciality_description = models.TextField(_("description"), null=True, blank=True)
 
     def __str__(self):
+        # Return the string representation of the specialization model
+        self.specialization = dict(SPECIAIALIZATION_CHOICES).get(self.specialization, '')
         return f"{self.specialization}"
