@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import AppointmentSerializer, FullAppointmentSerializer
+from .serializers import AppointmentSerializer, FullAppointmentSerializer, AppointmentSerializerForDoctors
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from .permissions import IsAppointmentOwner
@@ -11,13 +11,13 @@ from django.shortcuts import get_object_or_404
 from patient.models import PatientExtended, PatientProfile
 from rest_framework.response import Response
 from timeslot.models import TimeSlot
+from doctor.models import DoctorExtended
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsAppointmentOwner]
-    permission_classes = [AllowAny]
 
 
 
@@ -71,5 +71,24 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         serializer = AppointmentSerializer(appointment)
         # Return the serialized appointment object
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    
+
+class AppointmentViewSetForDoctors(viewsets.ModelViewSet):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializerForDoctors
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAppointmentOwner]
+
+            
+
+
+    def get_queryset(self):
+        doctor = self.request.user
+        doctor = DoctorExtended.objects.get(id=doctor.id)
+        
+        return Appointment.objects.filter(time_slot__doctor_profile__doctor=doctor)
+    
+
+    # Don't forget to handle permission classes and allow only not reserved appointments to be created and handle number of patients per time slot
 
     

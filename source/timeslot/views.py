@@ -16,10 +16,18 @@ class TimeSlotView(viewsets.ModelViewSet):
 
 
     def get_queryset(self, id=None):
+        print(self.request.user)
+
         doctor = self.request.user
-        print(doctor.id)
-        doctor = DoctorExtended.objects.get(id=id)
-        doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
+        print("doctor_id", doctor.id)
+
+        doctor = DoctorExtended.objects.get(id=doctor.id)
+        print("doctor: ", doctor)
+
+        doctor_profile = DoctorProfile.objects.get(doctor_id=doctor.id)
+
+        print(doctor_profile)
+
         return TimeSlot.objects.filter(doctor_profile=doctor_profile)
     
 

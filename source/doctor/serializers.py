@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Doctor, DoctorProfile, DoctorExtended
-from patient.serializers import ChangePasswordSerializer
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken, TokenError
 from review.serializers import ReviewSerializer
 from review.models import Review
@@ -66,8 +65,8 @@ class DoctorSerializer(serializers.ModelSerializer):
             raise e
 
 
-
     def update(self, instance, validated_data):
+
         full_name = validated_data.get("full_name", None)
         image = validated_data.get("image", None)
         qualifications = validated_data.get("qualifications", None)
@@ -81,18 +80,21 @@ class DoctorSerializer(serializers.ModelSerializer):
         password = validated_data.get("password", None)
         
         address = validated_data.get("address", None)
-        specialization = validated_data.get("specialization", None)
 
-        if address is not None:
-            location_data = address.pop('location')
-            location_instance, created = Location.objects.get_or_create(**location_data)
-            address_instance = Address.objects.create(location=location_instance, **address)
-            instance.address = address_instance
+        specialization = validated_data.get("specialization", None)
+                        
         
         if specialization is not None:
-            specialization_instance = Specialization.objects.create(**specialization)
-            instance.specialization = specialization_instance
+            
+            specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
+            if specialization_serializer.is_valid():
+                specialization_serializer.save()
+                
 
+        if address is not None:
+            address_serializer = AddressSerializer(instance.doctor.address, data=address, partial=True)
+            if address_serializer.is_valid():
+                address_serializer.save()
 
         if full_name is not None:
             instance.full_name = full_name
@@ -116,10 +118,7 @@ class DoctorSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
 class OuterViewDoctorSerializer(serializers.ModelSerializer):    
-
     specialization = SpecializationSerializer()
 
     address = AddressSerializer()
@@ -201,6 +200,7 @@ class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         return representation
+
 
 
 

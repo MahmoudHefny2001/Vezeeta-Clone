@@ -32,3 +32,10 @@ class PatientProfile(models.Model):
     
     points = models.PositiveIntegerField(default=0, null=True, blank=True)
     
+    # image = models.ImageField(upload_to="patient_profile", null=True, blank=True)
+
+    # location = models.ForeignKey
+
+    def __str__(self):
+        return self.patient.name
+

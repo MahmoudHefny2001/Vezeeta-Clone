@@ -40,12 +40,26 @@ class PatientSerializer(serializers.ModelSerializer):
         return patient
 
 
-    # def update(self, instance, validated_data):
-    #     # Allow partial updates
-    #     instance.name = validated_data.get("name", instance.name)
-    #     instance.has_medical_insurance = validated_data.get("has_medical_insurance", instance.has_medical_insurance)
-    #     instance.save()
-    #     return instance
+    def update(self, instance, validated_data):
+        name = validated_data.get("name", None)
+        phone_number = validated_data.get("phone_number", None)
+        email = validated_data.get("email", None)
+        password = validated_data.get("password", None)
+
+        print(validated_data)
+
+        if name:
+            instance.name = name
+        if phone_number:
+            instance.phone_number = phone_number
+        if email:
+            instance.email = email
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
+
+
 
 class OuterViewPatientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,59 +75,31 @@ class PatientReviewSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    patient = PatientSerializer()
-    # location = LocationSerializer(required=False)
+    patient = PatientSerializer(read_only=True)
 
     class Meta:
         model = PatientProfile
-        fields = ("id", "patient", "location", "points")
+        fields = ("id", "patient", "points")
         read_only_fields = ("points",)
 
+    
     def create(self, validated_data):
-        location_data = validated_data.pop("location")
-        # location = Location.objects.create(**location_data)        
-        # profile = PatientProfile.objects.create(location=location, **validated_data)  
-        # return profile
-
-    def update(self, instance, validated_data):
-        location_data = validated_data.pop("location")
-        # location_serializer = LocationSerializer(
-            # instance.location, data=location_data, partial=True
-        # )
-        # if location_serializer.is_valid():
-            # location = location_serializer.save()
-        # else:
-            # raise serializers.ValidationError(location_serializer.errors)
-        # instance.location = location
-
-        patient_data = validated_data.pop("patient")
-        patient_serializer = PatientSerializer(instance=instance.patient, data=patient_data, partial=True)
-        if patient_serializer.is_valid():
-            patient = patient_serializer.save()
-        else:
-            raise serializers.ValidationError(patient_serializer.errors)
-        instance.patient = patient
-
-        instance.save()
-        return instance
+        patient_profile = PatientProfile.objects.create(**validated_data)
+        return patient_profile
 
 
 
 class OuterViewProfileSerializer(serializers.ModelSerializer):
     patient = OuterViewPatientSerializer(read_only=True)
-    # location = LocationSerializer(required=False)
 
     class Meta:
         model = PatientProfile
-        fields = ("id", "patient", "location")
+        fields = ("id", "patient",)
 
 
 
-class ChangePasswordSerializer(serializers.Serializer):
-    model = User
+class PatientSerializerForAppointment(serializers.ModelSerializer):
 
-    """
-    Serializer for password change endpoint.
-    """
-    old_password = serializers.CharField(required=True)
-    new_password = serializers.CharField(required=True)
+    class Meta:
+        model = PatientExtended
+        fields = ('id', 'phone_number', 'gender', 'name', 'has_medical_insurance',)

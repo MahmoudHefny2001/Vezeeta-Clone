@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from patient.serializers import PatientSerializer, OuterViewPatientSerializer
+from patient.serializers import PatientSerializer, OuterViewPatientSerializer, PatientSerializerForAppointment
 from doctor.serializers import (
     DoctorProfileSerializer,
     # OuterViewDoctorProfileSerializer,
@@ -54,3 +54,15 @@ class AppointmentSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return appointment
+    
+
+class AppointmentSerializerForDoctors(serializers.ModelSerializer):
+    time_slot = TimeSlotSerializer()
+    patient =  PatientSerializerForAppointment()
+
+    class Meta:
+        model = Appointment
+        # fields = '__all__'
+        exclude = ('modified', )
+
+    

@@ -43,8 +43,6 @@ from rest_framework_word_filter import FullWordSearchFilter
 
 from .pagination import DoctorListPagination
 
-# from .filters import CityFilterBackend
-
 from specialization.choices import SPECIAIALIZATION_CHOICES
 from geo.choices import CITY_CHOICES, AREA_OR_CENTER_CHOICES 
 
@@ -56,7 +54,9 @@ from rest_framework.permissions import (
 )
 
 from specialization.serializers import SpecializationSerializer
-from geo.serializers import AddressSerializer
+
+from geo.models import Address, Location
+from geo.serializers import LocationSerializer, AddressSerializer
 
 
 class DoctorRegistrationView(views.APIView):
@@ -255,127 +255,46 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
 
 
     def get_permissions(self):
-        # if self.request.method in SAFE_METHODS:
-            # return [permissions.AllowAny()]
         return [IsObjectOwnerOrReadOnly()]
     
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        
+
         doctor_data = request.data.get('doctor', {})  # Access 'doctor' directly
 
-        specialization_data = doctor_data.get('specialization', {})  # Access 'specialization' within 'doctor'
+        specialization_data = doctor_data.get('specialization', {})  # Access 'specialization' within 'doctor'        
+
         address_data = doctor_data.get('address', {})  # Access 'address' within 'doctor'
+        
+        if doctor_data:
+            doctor_serializer = DoctorSerializer(instance.doctor, data=doctor_data, partial=True)
+            if doctor_serializer.is_valid():
+                doctor_serializer.save()
 
-        specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization_data, partial=True)
-        address_serializer = AddressSerializer(instance.doctor.address, data=address_data, partial=True)
-
-        doctor_serializer = DoctorSerializer(instance.doctor, data=doctor_data, partial=True)
-        doctor_profile_serializer = self.get_serializer(instance, data=request.data, partial=True)
-
-        if doctor_serializer.is_valid() and doctor_profile_serializer.is_valid():
-            doctor_serializer.save()
-            
+        if specialization_data:
+            specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization_data, partial=True)
             if specialization_serializer.is_valid():
                 specialization_serializer.save()
         
+
+        if address_data:
+            # location_data = address_data.pop('location', {})  # Access 'location' within 'address'
+            # if location_data:
+                
+            #     location_serializer = LocationSerializer(instance.doctor.address.location, data=location_data, partial=True)
+            #     if location_serializer.is_valid():
+            #         location_serializer.save()            
+            address_serializer = AddressSerializer(instance.doctor.address, data=address_data, partial=True)
             if address_serializer.is_valid():
                 address_serializer.save()
 
-            doctor_profile_serializer.save()
-            return Response(doctor_profile_serializer.data)
-        else:
-            errors = {
-                'doctor_errors': doctor_serializer.errors,
-                'specialization_errors': specialization_serializer.errors,
-                'address_errors': address_serializer.errors,
-                'profile_errors': doctor_profile_serializer.errors
-            }
-            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
+        serializer = self.get_serializer(instance, data=doctor_data, partial=True)
+        serializer.is_valid(raise_exception=True)
 
-class Logout(views.APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+        serializer.save()
 
-    def post(self, request):
-        try:
-            # Get the token
-            refresh_token = request.data["refresh_token"]
-            token = RefreshToken(refresh_token)
-
-            # Blacklist the token
-            outstanding_token, _ = OutstandingToken.objects.get_or_create(
-                token=str(token)
-            )
-            BlacklistedToken.objects.create(token=outstanding_token)
-
-            # Perform any additional actions or cleanup
-            # For example, you can delete any session-related data
-
-            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
-        except:
-            return Response(
-                {"detail": "Token is blacklisted"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-
-class ChangePasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for changing password.
-    """
-
-    # serializer_class = ChangePasswordSerializer
-    model = DoctorExtended
-    permission_classes = (IsAuthenticated,)
-
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
-
-    def update(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
-                return Response(
-                    {"old_password": ["Wrong password."]},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            # set_password also hashes the password that the user will get
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
-            response = {
-                "status": "success",
-                "code": status.HTTP_200_OK,
-                "message": "Password updated successfully",
-                "data": [],
-            }
-
-            return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-# from django.http import JsonResponse
-
-# def get_doctor_profile(request, doctor_profile_id):
-#     try:
-#         doctor_profile = DoctorProfile.objects.get(pk=doctor_profile_id)
-#     except DoctorProfile.DoesNotExist:
-#         return JsonResponse({"error": "Doctor profile not found"}, status=404)
-
-#     # Serialize the data
-#     serializer = OuterViewDoctorProfileSerializer(doctor_profile)
-    
-#     # Print the serialized data and queryset for debugging
-#     print("Serialized Data:", serializer.data)
-#     print("Queryset:", DoctorProfile.objects.all().query)  # Query used to retrieve data
-
-#     return JsonResponse(serializer.data)
+        return Response(serializer.data)
+        
 

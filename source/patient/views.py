@@ -5,7 +5,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import PatientSerializer, ProfileSerializer, ChangePasswordSerializer
+from .serializers import PatientSerializer, ProfileSerializer
 from rest_framework import status, generics, mixins, viewsets
 from django.conf import settings
 import jwt
@@ -41,12 +41,14 @@ class LoginView(APIView):
     def post(self, request):
         email_or_phone = request.data.get("email_or_phone")
         password = request.data.get("password")
+
+
         user = CustomUserAuthBackend().authenticate(
             request=request, username=email_or_phone, password=password
         )
 
         person = Person.objects.get(email=user.email)
-        
+
         patient = PatientExtended.objects.get(id=person.id)
 
         profile = PatientProfile.objects.get(patient=patient)
@@ -80,82 +82,27 @@ class ProfileViewSet(viewsets.ModelViewSet):
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
 
-    def get_permissions(self):
-        if self.action == "retrieve" or self.action == "update" or self.action == "partial_update" or self.action == "destroy":
-            self.permission_classes = [IsProfileOwner, ]
-         
-        elif self.action == 'list':
-            self.permission_classes = [IsAdminUser, ]
-        
-        return super(ProfileViewSet, self).get_permissions()
-
 
     def get_queryset(self):
-        return PatientProfile.objects.filter(patient=self.request.user)
+        patient = PatientExtended.objects.get(id=self.request.user.id)
+        return PatientProfile.objects.filter(patient=patient)
         
     
-    
-
-class Logout(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        try:
-            # Get the token
-            refresh_token = request.data["refresh_token"]
-            token = RefreshToken(refresh_token)
-
-            # Blacklist the token
-            outstanding_token, _ = OutstandingToken.objects.get_or_create(
-                token=str(token)
-            )
-            BlacklistedToken.objects.create(token=outstanding_token)
-            RefreshToken.for_user(request.user)
-            # Perform any additional actions or cleanup
-
-            return Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
-        except:
-            return Response(
-                {"Not allowed": "Token is blacklisted"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-
-class ChangePasswordView(generics.UpdateAPIView):
-    """
-    An endpoint for changing password.
-    """
-
-    serializer_class = ChangePasswordSerializer
-    model = PatientExtended
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = [JWTAuthentication]
-
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
-
     def update(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        serializer = self.get_serializer(data=request.data)
+        instance = self.get_object()
 
-        if serializer.is_valid():
-            # Check old password
-            if not self.object.check_password(serializer.data.get("old_password")):
-                return Response(
-                    {"old_password": ["Wrong password."]},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            # set_password also hashes the password that the user will get
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
-            response = {
-                "status": "success",
-                "code": status.HTTP_200_OK,
-                "message": "Password updated successfully",
-            }
 
-            return Response(response)
+        patient_data = request.data.get("patient", None)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+        if patient_data:
+            patient_serializer = PatientSerializer(instance.patient, data=patient_data, partial=True)
+            patient_serializer.is_valid(raise_exception=True)
+            patient_serializer.save()
+
+
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

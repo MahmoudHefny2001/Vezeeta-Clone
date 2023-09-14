@@ -5,6 +5,9 @@ from .choices import SPECIAIALIZATION_CHOICES
 
 
 class SpecializationSerializer(serializers.ModelSerializer):
+    specialization = serializers.CharField()
+
+
     class Meta:
         model = Specialization
         # fields = "__all__"
@@ -20,13 +23,27 @@ class SpecializationSerializer(serializers.ModelSerializer):
         return representation
     
     def update(self, instance, validated_data):
-        instance.specialization = validated_data.get('specialization', instance.specialization)
-        # medical_speciality_description is the previous value before the update
-        # allow null for medical_speciality_description
-        medical_speciality_description = validated_data.get('medical_speciality_description', None)
+        specialization = validated_data.get("specialization", None)
+
+        medical_speciality_description = validated_data.get("medical_speciality_description", None)
+        
         if medical_speciality_description is not None:
             instance.medical_speciality_description = medical_speciality_description
-        instance.save()
+            instance.save()
+        else:
+            pass
+
+        if specialization.isdigit():
+            instance.specialization = specialization
+            instance.save()
+        else:
+            for key, value in SPECIAIALIZATION_CHOICES:
+                if str(value) == str(specialization):
+                    specialization = key
+
+                    instance.specialization = specialization
+                    instance.save()
+                    
         return instance
     
     
