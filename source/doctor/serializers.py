@@ -86,13 +86,16 @@ class DoctorSerializer(serializers.ModelSerializer):
         
         if specialization is not None:
             
-            specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
+            # specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
+            specialization_serializer = SpecializationSerializer(instance.specialization, data=specialization, partial=True)
             if specialization_serializer.is_valid():
                 specialization_serializer.save()
                 
 
         if address is not None:
-            address_serializer = AddressSerializer(instance.doctor.address, data=address, partial=True)
+            address_serializer = AddressSerializer(instance.address, data=address, partial=True)
+
+            # address_serializer = AddressSerializer(instance.doctor.address, data=address, partial=True)
             if address_serializer.is_valid():
                 address_serializer.save()
 
