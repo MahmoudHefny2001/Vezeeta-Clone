@@ -20,7 +20,7 @@ DEBUG = bool(os.environ.get("DEBUG", None))
 if DEBUG:
     DEBUG = False
 
-# DEBUG = True
+DEBUG = True
 
 
 ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))

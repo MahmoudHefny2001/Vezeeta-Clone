@@ -74,6 +74,23 @@ class LoginView(APIView):
             )
 
 
+
+
+class PatientViewSet(viewsets.ModelViewSet):
+    queryset = PatientProfile.objects.all()
+    serializer_class = ProfileSerializer
+    authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsProfileOwner]
+    permission_classes = (AllowAny,)
+
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
+
+
+    def get_queryset(self):
+        patient = self.request.user
+        return PatientProfile.objects.filter(patient=patient)
+
+
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = PatientProfile.objects.all()
     serializer_class = ProfileSerializer
