@@ -14,6 +14,7 @@ from timeslot.serializers import TimeSlotSerializer
 
 from timeslot.models import TimeSlot
 
+import datetime 
 
 class DoctorSerializer(serializers.ModelSerializer):
     
@@ -148,7 +149,7 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
 
 
     def get_availability_data(self, obj):
-        time_slots = TimeSlot.objects.filter(doctor_profile=obj, is_reserved=False)
+        time_slots = TimeSlot.objects.filter(doctor_profile=obj, date=datetime.date.today(), is_reserved=False)
         time_slots_data = TimeSlotSerializer(time_slots, many=True).data
         return time_slots_data
     
@@ -172,6 +173,8 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
         return obj.available_time_slots.all()
 
 
+from django.db.models import F
+from django.utils import timezone
 
 class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
@@ -187,7 +190,10 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 
     def get_availability_data(self, obj):
-        time_slots = TimeSlot.objects.filter(doctor_profile=obj, is_reserved=False)
+        current_date = timezone.now().date()
+        date_string = current_date.strftime('%Y-%m-%d')
+
+        time_slots = TimeSlot.objects.filter(doctor_profile=obj, date__date=date_string, is_reserved=False,)
         time_slots_data = TimeSlotSerializer(time_slots, many=True).data
         return time_slots_data
     

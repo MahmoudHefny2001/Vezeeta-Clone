@@ -4,7 +4,6 @@ from django.db import models
 from patient.models import PatientProfile, Patient
 from doctor.models import DoctorProfile, Doctor
 
-
 class TimeSlot(models.Model):
 
     doctor_profile = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='available_time_slots')

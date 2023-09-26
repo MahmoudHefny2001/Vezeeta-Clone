@@ -46,7 +46,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         
         # fields = '__all__'
         # exclude = ('id', 'doctor_profile', )
-        exclude = ('doctor_profile', )
+        exclude = ('doctor_profile', 'date', )
 
     
 
