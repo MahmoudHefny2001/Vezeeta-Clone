@@ -48,13 +48,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         # exclude = ('id', 'doctor_profile', )
         exclude = ('doctor_profile', )
 
-
     
-    # def to_representation(self, instance):
-    #     representation = super().to_representation(instance)
-    #     if instance.date != datetime.date.today:
-    #         representation['date'] = None
-    #     return super().to_representation(instance)
 
 
 

@@ -148,7 +148,7 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
 
 
     def get_availability_data(self, obj):
-        time_slots = TimeSlot.objects.filter(doctor_profile=obj)
+        time_slots = TimeSlot.objects.filter(doctor_profile=obj, is_reserved=False)
         time_slots_data = TimeSlotSerializer(time_slots, many=True).data
         return time_slots_data
     
@@ -185,6 +185,20 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+    def get_availability_data(self, obj):
+        time_slots = TimeSlot.objects.filter(doctor_profile=obj, is_reserved=False)
+        time_slots_data = TimeSlotSerializer(time_slots, many=True).data
+        return time_slots_data
+    
+
+    def to_representation(self, instance):
+        
+        representation = super().to_representation(instance)
+        availability_data = self.get_availability_data(instance)
+        representation['availability'] = availability_data
+        return representation
+    
 
 class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)
