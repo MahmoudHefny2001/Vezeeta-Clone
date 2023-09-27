@@ -81,9 +81,9 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = PatientProfile.objects.all()
     serializer_class = ProfileSerializer
     authentication_classes = [JWTAuthentication]
-    # permission_classes = [IsProfileOwner]
-    permission_classes = (AllowAny,)
-
+    permission_classes = [IsProfileOwner]
+    
+    
     throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
 
