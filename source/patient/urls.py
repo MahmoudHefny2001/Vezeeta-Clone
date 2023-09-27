@@ -5,13 +5,13 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
+router.register(r"", PatientViewSet, basename="patients")
 router.register(r"^profiles", ProfileViewSet, basename="patient-profiles")
 
-router.register(r"", PatientViewSet, basename="patients")
 
 urlpatterns = [
-    path("", include(router.urls)),
-    path("sign-up/", SignUpView.as_view(), name="user_signup"),
-    path("login/", LoginView.as_view(), name="user_signup"),
+    path(" ", include(router.urls)),
+    path("sign-up/", SignUpView.as_view(), name="patients-signup"),
+    path("login/", LoginView.as_view(), name="patients-login"),
 
 ]
