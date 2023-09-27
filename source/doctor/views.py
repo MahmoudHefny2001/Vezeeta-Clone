@@ -190,7 +190,7 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.prefetch_related('available_time_slots').select_related('doctor')
+        queryset = queryset.prefetch_related('available_date').select_related('doctor')
 
         doctor_name = self.request.query_params.get('doctor_full_name', None)
         

@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 import datetime
 
-from .models import TimeSlot
+from .models import TimeSlot, DateSlot
 
 from doctor.models import DoctorProfile
 
@@ -46,8 +46,22 @@ class TimeSlotSerializer(serializers.ModelSerializer):
         
         # fields = '__all__'
         # exclude = ('id', 'doctor_profile', )
-        exclude = ('doctor_profile', 'date', )
+        exclude = ('date',)
 
+
+
+class DateSlotSerializer(serializers.ModelSerializer):
+        time = TimeSlotSerializer(many=True, read_only=True)
+        class Meta:
+            model = DateSlot
+            # fields = '__all__'
+            exclude = ('is_reserved', 'doctor_profile')
+            
+
+        def to_representation(self, instance):
+            representation = super().to_representation(instance)
+            representation['time'] = TimeSlotSerializer(instance.time_slots.all(), many=True).data
+            return representation
     
 
 

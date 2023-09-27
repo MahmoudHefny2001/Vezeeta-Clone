@@ -10,9 +10,9 @@ from specialization.serializers import SpecializationSerializer
 from specialization.models import Specialization
 from geo.models import Location, Address
 
-from timeslot.serializers import TimeSlotSerializer
+from timeslot.serializers import TimeSlotSerializer, DateSlotSerializer
 
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, DateSlot
 
 import datetime 
 
@@ -145,27 +145,32 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
 
     doctor = OuterViewDoctorSerializer(read_only=True)
 
-    availability = TimeSlotSerializer(many=True, read_only=True, allow_null=True, required=False)
+    dates = DateSlotSerializer(many=True, read_only=True, allow_null=True, required=False)
+    # availability = TimeSlotSerializer(many=True, read_only=True, allow_null=True, required=False)
 
 
-    def get_availability_data(self, obj):
-        time_slots = TimeSlot.objects.filter(doctor_profile=obj, date=datetime.date.today(), is_reserved=False)
-        time_slots_data = TimeSlotSerializer(time_slots, many=True).data
-        return time_slots_data
+    def get_dates_data(self, obj):
+        # date = DateSlot.objects.filter(doctor_profile=obj).first()
+        # time_slots = TimeSlot.objects.filter(date=date)
+        # time_slots_data = TimeSlotSerializer(time_slots, many=True).data
+        # return time_slots_data
+        date_slot = DateSlot.objects.filter(doctor_profile=obj)
+        date_slot_data = DateSlotSerializer(date_slot, many=True).data
+        return date_slot_data
     
 
     def to_representation(self, instance):
         
         representation = super().to_representation(instance)
-        availability_data = self.get_availability_data(instance)
-        representation['availability'] = availability_data
+        dates_data = self.get_dates_data(instance)
+        representation['dates'] = dates_data
         return representation
 
 
     class Meta:
         model = DoctorProfile
-        fields = ("id", "doctor", "availability",) 
-        read_only_fields = ('doctor', 'availability', )
+        fields = ("id", "doctor", "dates",) 
+        read_only_fields = ('doctor', 'dates_data', )
 
 
     
