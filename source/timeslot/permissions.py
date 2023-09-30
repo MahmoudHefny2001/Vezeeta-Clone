@@ -16,13 +16,11 @@ class IsAppointmentOwner(permissions.BasePermission):
         # if the doctor_profile is the same, then the doctor is the owner of the appointment
         # return true
         # else, return false
-
-        print("request.user", request.user)
         
         doctor = request.user
         doctor = DoctorExtended.objects.get(id=doctor.id)
         doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
-        if obj.doctor_profile == doctor_profile:
+        if obj.date.doctor_profile == doctor_profile:
             return True
         return False
     

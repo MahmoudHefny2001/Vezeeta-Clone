@@ -55,7 +55,7 @@ class DateSlotSerializer(serializers.ModelSerializer):
         class Meta:
             model = DateSlot
             # fields = '__all__'
-            exclude = ('is_reserved', 'doctor_profile')
+            exclude = ('is_reserved', 'doctor_profile',)
             
 
         def to_representation(self, instance):
@@ -67,10 +67,28 @@ class DateSlotSerializer(serializers.ModelSerializer):
 
 
 class TimeSlotSerializerForDoctors(serializers.ModelSerializer):
-    
+    # date = DateSlotSerializer()
     class Meta:
         model = TimeSlot
         
         # fields = '__all__'
-        exclude = ('doctor_profile', )
+        exclude = ('start_time', 'end_time', 'is_reserved', 'date')
 
+
+    def update(self, instance, validated_data):
+        # update the TimeSlot object with the new data
+        # save the TimeSlot object
+        # return the updated TimeSlot object
+        instance.start_time = validated_data.get('start_time', instance.start_time)
+        instance.end_time = validated_data.get('end_time', instance.end_time)
+        instance.is_reserved = validated_data.get('is_reserved', instance.is_reserved)
+        instance.save()
+        return instance
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # return representation of date as available dates
+        representation['available times'] = DateSlotSerializer(instance.date).data
+        
+        return representation
