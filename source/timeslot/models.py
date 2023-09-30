@@ -9,8 +9,9 @@ class DateSlot(models.Model):
     doctor_profile = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='available_date')
 
     date = models.DateField(default=datetime.date.today)
-    is_reserved = models.BooleanField(default=False, null=True, blank=True)
 
+    is_reserved = models.BooleanField(default=False, null=True, blank=True)
+    
     class Meta:
         db_table = "date_slot"
 

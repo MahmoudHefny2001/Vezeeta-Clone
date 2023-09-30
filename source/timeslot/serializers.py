@@ -5,8 +5,7 @@ import datetime
 
 from .models import TimeSlot, DateSlot
 
-from doctor.models import DoctorProfile
-
+from doctor.models import DoctorProfile, DoctorExtended
 
 
 class TimeSlotSerializerForPatients(serializers.ModelSerializer):
@@ -62,6 +61,7 @@ class DateSlotSerializer(serializers.ModelSerializer):
             representation = super().to_representation(instance)
             representation['time'] = TimeSlotSerializer(instance.time_slots.all(), many=True).data
             return representation
+        
     
 
 
@@ -92,3 +92,7 @@ class TimeSlotSerializerForDoctors(serializers.ModelSerializer):
         representation['available times'] = DateSlotSerializer(instance.date).data
         
         return representation
+    
+    
+
+        

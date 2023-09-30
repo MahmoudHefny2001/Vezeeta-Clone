@@ -32,23 +32,34 @@ class TimeSlotView(viewsets.ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-        date = request.data.get('date', None)
-        time = request.data.get('time', None)
-        doctor = DoctorExtended.objects.get(id=request.user.id)
+        
+        user = request.user
+        doctor = DoctorExtended.objects.get(id=user.id)
         doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
-        date_slot = DateSlot.objects.create(doctor_profile=doctor_profile, date=date)
-        time_slot = TimeSlot.objects.create(date=date_slot, start_time=time['start_time'], end_time=time['end_time'])
-        serializer = TimeSlotSerializerForDoctors(time_slot)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
-    
+            
+        date = request.data['date']
+        times = request.data['times']
+        
+        
+        for time in times:
+            start_time = time['start_time']
+            end_time = time['end_time']
+            is_reserved = time['is_reserved']
+            check_date = DateSlot.objects.filter(date=date, doctor_profile=doctor_profile).first()
+            if not check_date:
+                
+                date_slot = DateSlot.objects.create(date=date, doctor_profile=doctor_profile)
+                date_slot.save()
+                time_slot = TimeSlot.objects.create(date=date_slot, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
+                time_slot.save()
+            
+            else:
+                
+                time_slot = TimeSlot.objects.create(date=check_date, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
+                time_slot.save()
+        
 
-    def perform_create(self, serializer):
-        doctor = self.request.user
-        doctor = DoctorExtended.objects.get(id=doctor.id)
-        doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
-        serializer.save(doctor_profile=doctor_profile)
-
+    
     
     def update(self, request, *args, **kwargs):
         
@@ -95,3 +106,28 @@ class TimeSlotView(viewsets.ModelViewSet):
         instance.save()
         serializer = TimeSlotSerializerForDoctors(instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+from .serializers import DateSlotSerializer
+
+class DateSlotView(viewsets.ModelViewSet):
+    queryset = DateSlot.objects.all()
+    serializer_class = DateSlotSerializer
+    permission_classes = [IsAppointmentOwner,]
+    
+    def get_queryset(self, id=None):
+        queryset = self.queryset
+        
+        doctor = DoctorExtended.objects.get(id=self.request.user.id)
+
+        doctor_profile = DoctorProfile.objects.get(doctor_id=doctor.id)
+
+        queryset = queryset.filter(doctor_profile=doctor_profile.id)
+        
+        return queryset
+    
+
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
