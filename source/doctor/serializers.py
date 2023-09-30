@@ -154,7 +154,7 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
         # time_slots = TimeSlot.objects.filter(date=date)
         # time_slots_data = TimeSlotSerializer(time_slots, many=True).data
         # return time_slots_data
-        date_slot = DateSlot.objects.filter(doctor_profile=obj)
+        date_slot = DateSlot.objects.filter(doctor_profile=obj, date__gte=datetime.date.today())
         date_slot_data = DateSlotSerializer(date_slot, many=True).data
         return date_slot_data
     

@@ -7,6 +7,7 @@ from doctor.models import DoctorProfile, DoctorExtended
 from .permissions import IsAppointmentOwner
 from rest_framework.response import Response
 
+from django.utils import timezone
 
 
 class TimeSlotView(viewsets.ModelViewSet):
@@ -16,15 +17,17 @@ class TimeSlotView(viewsets.ModelViewSet):
 
 
     def get_queryset(self, id=None):
-
+        queryset = self.queryset
         doctor = self.request.user
 
         doctor = DoctorExtended.objects.get(id=doctor.id)
 
         doctor_profile = DoctorProfile.objects.get(doctor_id=doctor.id)
 
+        queryset = queryset.filter(date__doctor_profile=doctor_profile.id)
+        # queryset = queryset.filter(date__date__gte=timezone.now()).order_by('date__date', 'start_time')
 
-        return TimeSlot.objects.filter(date__doctor_profile=doctor_profile)
+        return queryset
     
 
 

@@ -58,6 +58,8 @@ from specialization.serializers import SpecializationSerializer
 from geo.models import Address, Location
 from geo.serializers import LocationSerializer, AddressSerializer
 
+from django.utils import timezone
+
 
 class DoctorRegistrationView(views.APIView):
     permission_classes = [AllowAny,]
@@ -241,7 +243,7 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         if conditions:
             queryset = queryset.filter(conditions).order_by('id')
             
-
+        queryset = queryset.filter(available_date__date__gte=timezone.now()).order_by('id')
         return queryset.order_by('id')
 
 
