@@ -243,7 +243,7 @@ class DoctorProfileViewSet(viewsets.ReadOnlyModelViewSet):
         if conditions:
             queryset = queryset.filter(conditions).order_by('id')
             
-        queryset = queryset.filter(available_date__date__gte=timezone.now()).order_by('id')
+        # queryset = queryset.filter(available_date__date__gte=timezone.now()).order_by('id')
         return queryset.order_by('id')
 
 
