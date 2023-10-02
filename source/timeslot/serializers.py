@@ -79,6 +79,11 @@ class TimeSlotSerializerForDoctors(serializers.ModelSerializer):
         # update the TimeSlot object with the new data
         # save the TimeSlot object
         # return the updated TimeSlot object
+
+        print("Being Called")
+
+        print(validated_data)
+
         instance.start_time = validated_data.get('start_time', instance.start_time)
         instance.end_time = validated_data.get('end_time', instance.end_time)
         instance.is_reserved = validated_data.get('is_reserved', instance.is_reserved)

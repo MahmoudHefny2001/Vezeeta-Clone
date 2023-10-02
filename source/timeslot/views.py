@@ -95,6 +95,7 @@ class TimeSlotView(viewsets.ModelViewSet):
         # Partially update the resource with PATCH
         # Get the TimeSlot object to update
         instance = self.get_object()
+        print("Instance", instance)
         # Check if the doctor is the owner of the TimeSlot
         if not IsAppointmentOwner().has_object_permission(request, self, instance):
             return Response({"detail": "You do not have permission to update this TimeSlot."}, status=status.HTTP_403_FORBIDDEN)
@@ -105,10 +106,22 @@ class TimeSlotView(viewsets.ModelViewSet):
         # save the TimeSlot object
         # return the updated TimeSlot object
 
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        print("Date", request.data)
+
+        time = request.data['time']
+        start_time = time.get('start_time', None)
+        end_time = time.get('end_time', None)
+        is_reserved = time.get('is_reserved', None)
+        
+        if start_time:
+            instance.start_time = start_time
+        if end_time:
+            instance.end_time = end_time
+        if is_reserved:
+            instance.is_reserved = is_reserved
+        instance.save()
+        return Response(TimeSlotSerializer(instance).data)
+        
     
 
 

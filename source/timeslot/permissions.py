@@ -20,7 +20,7 @@ class IsAppointmentOwner(permissions.BasePermission):
         doctor = request.user
         doctor = DoctorExtended.objects.get(id=doctor.id)
         doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
-        if obj.doctor_profile == doctor_profile:
+        if obj.date.doctor_profile == doctor_profile:
             return True
         return False
     
