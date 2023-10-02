@@ -54,7 +54,7 @@ class DateSlotSerializer(serializers.ModelSerializer):
         class Meta:
             model = DateSlot
             # fields = '__all__'
-            exclude = ('is_reserved', 'doctor_profile',)
+            exclude = ('id', 'is_reserved', 'doctor_profile',)
             
 
         def to_representation(self, instance):

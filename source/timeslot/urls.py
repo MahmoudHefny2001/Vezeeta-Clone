@@ -1,4 +1,4 @@
-from .views import TimeSlotView
+from .views import TimeSlotView, DateSlotView
 from django.urls import path, include
 
 from rest_framework.routers import DefaultRouter
@@ -6,6 +6,8 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 
 router.register(r"", TimeSlotView, basename="time_slot")
+# router.register(r"yourTimes", DateSlotView)
+
 
 
 urlpatterns = [

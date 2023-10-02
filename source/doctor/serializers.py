@@ -178,14 +178,12 @@ class OuterViewDoctorProfileSerializer(serializers.ModelSerializer):
         return obj.available_time_slots.all()
 
 
-from django.db.models import F
-from django.utils import timezone
 
 class DoctorProfileSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
     doctor = OuterViewDoctorSerializer(read_only=True)
     
-    availability = TimeSlotSerializer(many=True, allow_null=True, required=False)
+    availability = DateSlotSerializer(many=True, allow_null=True, required=False)
 
 
     class Meta:
@@ -194,22 +192,24 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 
 
 
-    def get_availability_data(self, obj):
-        current_date = timezone.now().date()
-        date_string = current_date.strftime('%Y-%m-%d')
-
-        time_slots = TimeSlot.objects.filter(doctor_profile=obj, date__date=date_string, is_reserved=False,)
-        time_slots_data = TimeSlotSerializer(time_slots, many=True).data
-        return time_slots_data
+    def get_dates_data(self, obj):
+        # date = DateSlot.objects.filter(doctor_profile=obj).first()
+        # time_slots = TimeSlot.objects.filter(date=date)
+        # time_slots_data = TimeSlotSerializer(time_slots, many=True).data
+        # return time_slots_data
+        date_slot = DateSlot.objects.filter(doctor_profile=obj, date__gte=datetime.date.today())
+        date_slot_data = DateSlotSerializer(date_slot, many=True).data
+        return date_slot_data
     
 
     def to_representation(self, instance):
         
         representation = super().to_representation(instance)
-        availability_data = self.get_availability_data(instance)
-        representation['availability'] = availability_data
+        dates_data = self.get_dates_data(instance)
+        representation['dates'] = dates_data
         return representation
     
+
 
 class DoctorProfileSerializerForDoctors(serializers.ModelSerializer):
     doctor = DoctorSerializer(read_only=True)

@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from django.utils import timezone
 
 
+from .serializers import DateSlotSerializer
+
 class TimeSlotView(viewsets.ModelViewSet):
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializerForDoctors
@@ -38,27 +40,34 @@ class TimeSlotView(viewsets.ModelViewSet):
         doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
             
         date = request.data['date']
-        times = request.data['times']
+        time = request.data['time']
         
+        date_slot = None
         
-        for time in times:
-            start_time = time['start_time']
-            end_time = time['end_time']
-            is_reserved = time['is_reserved']
-            check_date = DateSlot.objects.filter(date=date, doctor_profile=doctor_profile).first()
-            if not check_date:
-                
-                date_slot = DateSlot.objects.create(date=date, doctor_profile=doctor_profile)
-                date_slot.save()
-                time_slot = TimeSlot.objects.create(date=date_slot, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
-                time_slot.save()
+        start_time = time['start_time']
+        end_time = time['end_time']
+        is_reserved = time.get('is_reserved', None)
+        check_date = DateSlot.objects.filter(date=date, doctor_profile=doctor_profile).first()
+        if not check_date:
+            date_slot = DateSlot.objects.create(date=date, doctor_profile=doctor_profile)
+            date_slot.save()
+            time_slot = TimeSlot.objects.create(date=date_slot, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
+            time_slot.save()
             
-            else:
-                
-                time_slot = TimeSlot.objects.create(date=check_date, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
-                time_slot.save()
+        else:
+            time_slot = TimeSlot.objects.create(date=check_date, start_time=start_time, end_time=end_time, is_reserved=is_reserved)
+            time_slot.save()
         
-
+        return Response(
+            {
+                "status": "success",
+                "message": "TimeSlot created successfully",
+                "data": {
+                    "date": time_slot.date.date,
+                    "time": TimeSlotSerializer(time_slot).data},
+            },
+            status=status.HTTP_201_CREATED,
+        )
     
     
     def update(self, request, *args, **kwargs):
@@ -80,36 +89,28 @@ class TimeSlotView(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data)
 
+
+
     def partial_update(self, request, *args, **kwargs):
         # Partially update the resource with PATCH
+        # Get the TimeSlot object to update
         instance = self.get_object()
+        # Check if the doctor is the owner of the TimeSlot
         if not IsAppointmentOwner().has_object_permission(request, self, instance):
             return Response({"detail": "You do not have permission to update this TimeSlot."}, status=status.HTTP_403_FORBIDDEN)
-
-        time = request.data.get('time', None)
-        doctor = DoctorExtended.objects.get(id=request.user.id)
-        doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
         
-        
-        # Allow null values for is_reserved, start_time, and end_time
-        
+        # Serialize the updated data and save it
+        # get start_time and end_time and is_reserved from request.data
+        # update the TimeSlot object with the new data
+        # save the TimeSlot object
+        # return the updated TimeSlot object
 
-        is_reserved = time.get('is_reserved', None)
-        start_time = time.get('start_time', None)
-        end_time = time.get('end_time', None)
-        if is_reserved:
-            instance.is_reserved = is_reserved
-        if start_time:
-            instance.start_time = start_time
-        if end_time:
-            instance.end_time = end_time
-        instance.save()
-        serializer = TimeSlotSerializerForDoctors(instance)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    
 
-
-
-from .serializers import DateSlotSerializer
 
 class DateSlotView(viewsets.ModelViewSet):
     queryset = DateSlot.objects.all()
@@ -131,3 +132,8 @@ class DateSlotView(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+    
+
+
+    # def update(self, request, *args, **kwargs):
+        
