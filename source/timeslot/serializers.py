@@ -9,32 +9,33 @@ from doctor.models import DoctorProfile, DoctorExtended
 
 
 class TimeSlotSerializerForPatients(serializers.ModelSerializer):
-    
+    date = serializers.StringRelatedField()
 
     class Meta:
         model = TimeSlot    
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('is_reserved',)
 
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
         
-        try:
-            representation['doctor_profile'] = {
-                "doctor_id": instance.doctor_profile.doctor.id,
-                "doctor_name": instance.doctor_profile.doctor.full_name,
-                "doctor_specialization": instance.doctor_profile.doctor.specialization.specialization,
-                "doctor_image": instance.doctor_profile.doctor.image,
-            }        
-        except Exception as e:
-            raise "Image not found"
-        finally:
-            representation['doctor_profile'] = {
-                "doctor_id": instance.doctor_profile.doctor.id,
-                "doctor_name": instance.doctor_profile.doctor.full_name,
-                "doctor_specialization": instance.doctor_profile.doctor.specialization.medical_speciality_description,
-            }
-        return representation    
+    #     try:
+    #         representation['doctor_profile'] = {
+    #             "doctor_id": instance.doctor_profile.doctor.id,
+    #             "doctor_name": instance.doctor_profile.doctor.full_name,
+    #             "doctor_specialization": instance.doctor_profile.doctor.specialization.specialization,
+    #             "doctor_image": instance.doctor_profile.doctor.image,
+    #         }        
+    #     except Exception as e:
+    #         raise "Image not found"
+    #     # finally:
+    #         # representation['doctor_profile'] = {
+    #             # "doctor_id": instance.doctor_profile.doctor.id,
+    #             # "doctor_name": instance.doctor_profile.doctor.full_name,
+    #             # "doctor_specialization": instance.doctor_profile.doctor.specialization.medical_speciality_description,
+    #         # }
+    #     # return representation    
     
 
 

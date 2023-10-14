@@ -57,7 +57,10 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         # Get the time_slot_id from the request
         time_slot_id = self.request.data.get('time_slot_id')
         # Get the time_slot object
-        time_slot = TimeSlot.objects.get(id=time_slot_id, doctor_profile=doctor_profile_id)
+        time_slot = TimeSlot.objects.get(id=time_slot_id)
+
+        
+
         # Get the appointment object
         print("time_slot", time_slot)
 
@@ -82,11 +85,11 @@ class AppointmentViewSetForDoctors(viewsets.ModelViewSet):
             
 
 
-    def get_queryset(self):
-        doctor = self.request.user
-        doctor = DoctorExtended.objects.get(id=doctor.id)
+    # def get_queryset(self):
+        # doctor = self.request.user
+        # doctor = DoctorExtended.objects.get(id=doctor.id)
         
-        return Appointment.objects.filter(time_slot__doctor_profile__doctor=doctor)
+        # return Appointment.objects.filter(time_slot__doctor_profile__doctor=doctor)
     
 
     # Don't forget to handle permission classes and allow only not reserved appointments to be created and handle number of patients per time slot

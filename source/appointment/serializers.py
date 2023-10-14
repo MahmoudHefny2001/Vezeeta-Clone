@@ -46,7 +46,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
         time_slot_id = self.validated_data.pop('time_slot_id')
 
-        timeslot = TimeSlot.objects.get(id=time_slot_id, doctor_profile_id=doctor_profile_id)
+        timeslot = TimeSlot.objects.get(id=time_slot_id,)
 
         appointment = Appointment.objects.create(
             patient=patient,

@@ -15,8 +15,12 @@ class DateSlot(models.Model):
     class Meta:
         db_table = "date_slot"
 
-    def __str__(self) -> str:
-        return f"{self.date} is reserved: {self.is_reserved}"
+
+    def __str__(self):
+        return f"{self.date}"
+
+    # def __str__(self) -> str:
+        # return f"{self.date} is reserved: {self.is_reserved}"
 
 class TimeSlot(models.Model):
 
