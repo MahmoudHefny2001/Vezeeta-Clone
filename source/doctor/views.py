@@ -298,5 +298,64 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
         serializer.save()
 
         return Response(serializer.data)
+    
+
+    def partial_update(self, request, *args, **kwargs):
+        print(request.data)
+        
+        instance = self.get_object()
+        print(instance)
+        
+        full_name = request.data.get("full_name", None)
+        if full_name:
+            instance.doctor.full_name = full_name
+            instance.doctor.save()
+        
+        image = request.data.get("image", None)
+        if image:
+            instance.doctor.image = image
+            instance.doctor.save()
+
+        qualifications = request.data.get("qualifications", None)
+        if qualifications:
+            instance.doctor.qualifications = qualifications
+            instance.doctor.save()
+            
+        appointment_price = request.data.get("appointment_price", None)
+        if appointment_price:
+            instance.doctor.appointment_price = appointment_price
+            instance.doctor.save()
+        clinic_number = request.data.get("clinic_number", None)
+        if clinic_number:
+            instance.doctor.clinic_number = clinic_number
+            instance.doctor.save()
+        gender = request.data.get("gender", None)
+        if gender:
+            instance.doctor.gender = gender
+            instance.doctor.save()
+
+        phone_number = request.data.get("phone_number", None)
+        if phone_number:
+            instance.doctor.phone_number = phone_number
+            instance.doctor.save()
+            
+        email = request.data.get("email", None)
+        if email:
+            instance.doctor.email = email
+            instance.doctor.save()
+
+        specialization = request.data.get("specialization", None)
+        if specialization:
+            specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
+            if specialization_serializer.is_valid():
+                specialization_serializer.save()
+        
+        address = request.data.get("address", None)
+        if address:
+            address_serializer = AddressSerializer(instance.doctor.address, data=address, partial=True)
+            if address_serializer.is_valid():
+                address_serializer.save()
+
+        return super().partial_update(request, *args, **kwargs)
         
 

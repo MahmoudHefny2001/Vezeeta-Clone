@@ -107,10 +107,12 @@ class AddressSerializer(serializers.ModelSerializer):
             instance.location_details = location_details
             instance.save()
 
-        if name.isdigit():
+        if type(name) == int:
+            print("is number")
             instance.name = name
             instance.save()
         else:
+            print("is string")
             for key, value in AREA_OR_CENTER_CHOICES:
                 if str(value) == str(name):
                     name = key
