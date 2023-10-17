@@ -300,11 +300,8 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 
-    def partial_update(self, request, *args, **kwargs):
-        print(request.data)
-        
+    def partial_update(self, request, *args, **kwargs):        
         instance = self.get_object()
-        print(instance)
         
         full_name = request.data.get("full_name", None)
         if full_name:
@@ -345,6 +342,7 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
             instance.doctor.save()
 
         specialization = request.data.get("specialization", None)
+        print("view:", specialization)
         if specialization:
             specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
             if specialization_serializer.is_valid():

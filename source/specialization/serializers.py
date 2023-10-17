@@ -22,9 +22,9 @@ class SpecializationSerializer(serializers.ModelSerializer):
         representation['specialization'] = self.get_specialization(instance)
         return representation
     
+
     def update(self, instance, validated_data):
         specialization = validated_data.get("specialization", None)
-
         medical_speciality_description = validated_data.get("medical_speciality_description", None)
         
         if medical_speciality_description is not None:
@@ -33,17 +33,19 @@ class SpecializationSerializer(serializers.ModelSerializer):
         else:
             pass
 
-        if specialization.isdigit():
-            instance.specialization = specialization
-            instance.save()
-        else:
-            for key, value in SPECIAIALIZATION_CHOICES:
-                if str(value) == str(specialization):
-                    specialization = key
-
-                    instance.specialization = specialization
-                    instance.save()
-                    
+        if specialization:
+            print("serializer:", specialization)
+            if specialization.isdigit():
+                instance.specialization = specialization
+                instance.save()
+                return instance
+            
+            else:
+                for key, value in SPECIAIALIZATION_CHOICES:
+                    if str(value) == str(specialization):
+                        specialization = key
+                        instance.specialization = specialization
+                        instance.save()
         return instance
     
     

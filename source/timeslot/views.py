@@ -26,7 +26,7 @@ class TimeSlotView(viewsets.ModelViewSet):
 
         doctor_profile = DoctorProfile.objects.get(doctor_id=doctor.id)
 
-        queryset = queryset.filter(date__doctor_profile=doctor_profile.id)
+        queryset = queryset.filter(date__doctor_profile=doctor_profile.id).distinct('date__date',)
         # queryset = queryset.filter(date__date__gte=timezone.now()).order_by('date__date', 'start_time')
 
         return queryset
