@@ -13,6 +13,8 @@ from patient.models import PatientExtended
 from timeslot.models import TimeSlot
 from timeslot.serializers import TimeSlotSerializer, TimeSlotSerializerForPatients
 
+from rest_framework.response import Response
+from rest_framework import status
 
 class FullAppointmentSerializer(serializers.ModelSerializer):
     time_slot = TimeSlotSerializerForPatients()
@@ -31,30 +33,34 @@ class FullAppointmentSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+
+    patient_phone_number = serializers.CharField(max_length=255, required=False)
+    patient_full_name = serializers.CharField(max_length=255, required=False)
+    patient_email = serializers.EmailField(max_length=255, required=False)
+
     class Meta:
         model = Appointment
         fields = '__all__'
         # exclude = ('id', 'doctor_profile', )
 
-    def create(self, validated_data):
-        doctor_profile_id = self.validated_data.pop('doctor_profile_id')
+    # def create(self, validated_data):
+    #     doctor_profile_id = self.validated_data.pop('doctor_profile_id')
 
-        user = self.request.user
-        print(user)
-        patient = PatientExtended.objects.get(id=user.id)
-        print(patient)
+    #     time_slot_id = self.validated_data.pop('time_slot_id')
 
-        time_slot_id = self.validated_data.pop('time_slot_id')
+    #     timeslot = TimeSlot.objects.get(id=time_slot_id,)
 
-        timeslot = TimeSlot.objects.get(id=time_slot_id,)
-
-        appointment = Appointment.objects.create(
-            patient=patient,
-            time_slot=timeslot,
-            **validated_data
-        )
-        return appointment
+    #     # appointment = Appointment.objects.create(
+    #     #     patient=patient,
+    #     #     time_slot=timeslot,
+    #     #     **validated_data
+    #     # )
+    #     return{
+    #         "appointment created successfully": appointment,
+    #         "patient": {patient},
+    #     }
     
+
 
 class AppointmentSerializerForDoctors(serializers.ModelSerializer):
     time_slot = TimeSlotSerializer()

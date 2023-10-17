@@ -39,10 +39,10 @@ class LoginView(APIView):
 
 
     def post(self, request):
-
         email_or_phone = request.data.get("email_or_phone")
         password = request.data.get("password")
 
+        print(email_or_phone, password)
 
         user = CustomUserAuthBackend().authenticate(
             request=request, username=email_or_phone, password=password

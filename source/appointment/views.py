@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from patient.serializers import OuterViewPatientSerializer
 from .serializers import AppointmentSerializer, FullAppointmentSerializer, AppointmentSerializerForDoctors
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
@@ -17,7 +19,8 @@ from doctor.models import DoctorExtended
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsAppointmentOwner]
+    # permission_classes = [IsAuthenticatedOrReadOnly, IsAppointmentOwner]
+    permission_classes = (AllowAny,)
 
 
 
@@ -29,10 +32,11 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
 
     def get_queryset(self):
-        patient = self.request.user
-        patient = PatientExtended.objects.get(id=patient.id)
+        doctor = self.request.user
+        doctor = DoctorExtended.objects.get(id=doctor.id)
+        doctor_profile = DoctorProfile.objects.get(doctor=doctor.id)
         
-        return Appointment.objects.filter(patient=patient)
+        return Appointment.objects.filter(time_slot__date__doctor_profile=doctor_profile)
     
 
     # Don't forget to handle permission classes and allow only not reserved appointments to be created and handle number of patients per time slot
@@ -45,35 +49,50 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
         # Get the doctor_profile object
         doctor_profile = DoctorProfile.objects.get(id=doctor_profile_id)
-
         print("doctor_profile", doctor_profile)
-
+        
         # Get the patient_profile object
-        patient = self.request.user
-        patient = PatientExtended.objects.get(id=patient.id)
-        patient_profile = PatientProfile.objects.get(patient=patient.id)
-        print("patient_profile", patient_profile)
+        
+        patient_phone_number = request.data.get('patient_phone_number', None)
+        patient_full_name = request.data.get('patient_full_name', None)
+        patient_email = request.data.get('patient_email', None)
+
+        print(patient_email, patient_full_name, patient_phone_number)
+
+        try:
+            patient = self.request.user
+            patient = PatientExtended.objects.get(id=patient.id)
+            # patient_profile = PatientProfile.objects.get(patient=patient.id)
+        except:
+            patient = PatientExtended.objects.create(
+                name=patient_full_name,
+                phone_number=patient_phone_number,
+                email=patient_email,
+            )
         
         # Get the time_slot_id from the request
         time_slot_id = self.request.data.get('time_slot_id')
         # Get the time_slot object
         time_slot = TimeSlot.objects.get(id=time_slot_id)
 
-        
-
         # Get the appointment object
-        print("time_slot", time_slot)
-
-
-
         appointment = Appointment.objects.create(
             patient=patient,
             time_slot=time_slot,
         )
+
+        patient_serializer = OuterViewPatientSerializer(patient)
+
         # Serialize the appointment object
         serializer = AppointmentSerializer(appointment)
         # Return the serialized appointment object
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "appointment": serializer.data, 
+                "patient": patient_serializer.data,
+            },
+            status=status.HTTP_201_CREATED
+        )
 
     
 
@@ -81,17 +100,5 @@ class AppointmentViewSetForDoctors(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializerForDoctors
     permission_classes = [IsAuthenticatedOrReadOnly, IsAppointmentOwner]
-
-            
-
-
-    # def get_queryset(self):
-        # doctor = self.request.user
-        # doctor = DoctorExtended.objects.get(id=doctor.id)
-        
-        # return Appointment.objects.filter(time_slot__doctor_profile__doctor=doctor)
-    
-
-    # Don't forget to handle permission classes and allow only not reserved appointments to be created and handle number of patients per time slot
 
     
