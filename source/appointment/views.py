@@ -81,11 +81,16 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             time_slot=time_slot,
         )
 
+        time_slot.is_reserved = True
+
         patient_serializer = OuterViewPatientSerializer(patient)
 
         # Serialize the appointment object
         serializer = AppointmentSerializer(appointment)
         # Return the serialized appointment object
+
+        
+
         return Response(
             {
                 "appointment": serializer.data, 
