@@ -82,6 +82,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         )
 
         time_slot.is_reserved = True
+        time_slot.date.is_reserved = True
 
         patient_serializer = OuterViewPatientSerializer(patient)
 
