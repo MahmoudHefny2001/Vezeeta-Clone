@@ -342,7 +342,6 @@ class DoctorProfileViewSetForDoctors(viewsets.ModelViewSet):
             instance.doctor.save()
 
         specialization = request.data.get("specialization", None)
-        print("view:", specialization)
         if specialization:
             specialization_serializer = SpecializationSerializer(instance.doctor.specialization, data=specialization, partial=True)
             if specialization_serializer.is_valid():

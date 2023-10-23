@@ -42,22 +42,17 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     # Don't forget to handle permission classes and allow only not reserved appointments to be created and handle number of patients per time slot
 
     def create(self, request, *args, **kwargs):
-        print("inside create")
         # Get the doctor_profile_id from the request
         doctor_profile_id = self.request.data.get('doctor_profile_id')
-        print("doctor_profile_id", doctor_profile_id)
 
         # Get the doctor_profile object
         doctor_profile = DoctorProfile.objects.get(id=doctor_profile_id)
-        print("doctor_profile", doctor_profile)
         
         # Get the patient_profile object
         
         patient_phone_number = request.data.get('patient_phone_number', None)
         patient_full_name = request.data.get('patient_full_name', None)
         patient_email = request.data.get('patient_email', None)
-
-        print(patient_email, patient_full_name, patient_phone_number)
 
         try:
             patient = self.request.user
@@ -83,6 +78,11 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
         time_slot.is_reserved = True
         time_slot.date.is_reserved = True
+        time_slot.save()
+
+        print(time_slot.is_reserved, time_slot.date.is_reserved)
+
+        print(TimeSlot.objects.get(id=time_slot_id).is_reserved, TimeSlot.objects.get(id=time_slot_id).date.is_reserved)
 
         patient_serializer = OuterViewPatientSerializer(patient)
 
