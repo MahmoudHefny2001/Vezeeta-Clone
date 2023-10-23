@@ -11,12 +11,12 @@ from django.utils import timezone
 
 
 from .serializers import DateSlotSerializer
-
+from .pagination import TimeSlotListPagination
 class TimeSlotView(viewsets.ModelViewSet):
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializerForDoctors
     permission_classes = [IsAppointmentOwner]
-
+    pagination_class = TimeSlotListPagination
 
     def get_queryset(self, id=None):
         queryset = self.queryset
@@ -28,7 +28,7 @@ class TimeSlotView(viewsets.ModelViewSet):
 
         queryset = queryset.filter(date__doctor_profile=doctor_profile.id).distinct('date__date',)
         # queryset = queryset.filter(date__date__gte=timezone.now()).order_by('date__date', 'start_time')
-
+        queryset = queryset.order_by('date__date', 'start_time')
         return queryset
     
 
