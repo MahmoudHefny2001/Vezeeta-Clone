@@ -27,7 +27,7 @@ class Address(models.Model):
     class Meta:
         db_table = "address"
 
-    location = models.ForeignKey(Location, on_delete=models.SET_DEFAULT, default=1)
+    location = models.ForeignKey(Location, on_delete=models.DO_NOTHING, default=1)
 
     name = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False, db_index=True)
     
