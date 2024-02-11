@@ -28,6 +28,8 @@ ALLOWED_HOSTS = list(str(os.environ.get("ALLOWED_HOSTS")).split(", "))
 
 INSTALLED_APPS = [
 
+    'jazzmin', # for admin panel
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -255,7 +257,7 @@ RAILWAY_VOLUME_MOUNT_PATH = str(os.environ.get("RAILWAY_VOLUME_MOUNT_PATH"))
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
@@ -299,6 +301,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8080",
     "http://192.168.0.222:8080",
+    "http://127.0.0.1:800",
 ]
 
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -312,4 +315,34 @@ CORS_ALLOWED_ORIGINS = [
 # EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 # EMAIL_USE_TLS = bool(os.environ.get("EMAIL_USE_TLS"))
 # DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+
+
+
+
+
+JAZZMIN_SETTINGS = {
+# "site_title": "",
+# "site_header": "",
+# "site_brand": "",
+# "site_logo": "",
+"site_logo_classes": "img-circle",
+"welcome_sign": "Welcome to Doctorak Admin Panel",
+"related_modal_active": False,
+"copyright": "Mahmoud Hefny",
+"show_sidebar": True,
+"navigation_expanded": True,
+"show_ui_builder": True,
+
+# "topmenu_links": 
+# [
+#   {'name': '', 'url': '',},
+#   {'name':"","url":""},
+#   {"name":"","url":"",},
+# 
+# ],
+
+"usermenu_links": [
+     {'name':"Support", "url":"https://www.facebook.com/"},
+    ],
+}
 

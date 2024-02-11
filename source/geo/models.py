@@ -31,7 +31,7 @@ class Address(models.Model):
 
     name = models.CharField(choices=AREA_OR_CENTER_CHOICES, null=False, blank=False, db_index=True)
     
-    location_details = models.TextField()
+    location_details = models.TextField(null = True, blank = False, default="")
     
 
     def __str__(self):

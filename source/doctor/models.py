@@ -66,4 +66,4 @@ class DoctorProfile(models.Model):
     # waiting_duration = models.CharField(max_length=100)
 
     def __str__(self) -> str:
-        return f"profile {self.id} of {self.doctor.full_name}"
+        return f"{self.doctor.full_name}"
